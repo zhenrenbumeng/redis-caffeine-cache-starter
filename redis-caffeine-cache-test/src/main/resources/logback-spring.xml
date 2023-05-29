@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <appender name="LOCAL" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>%d{mm:ss} %highlight(%1.1level)[%X{trace_id}] %green([%25.25logger{15}][%20.20M]) %gray(%msg)\n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="LOCAL"/>
+    </root>
+    <!--    <springProfile name="">-->
+    <!--        <root level="info">-->
+    <!--            <appender-ref ref="LOCAL"/>-->
+    <!--        </root>-->
+    <!--    </springProfile>-->
+
+    <!--  关闭redisCaffeineCache内部log  -->
+    <logger name="org.pw.redisCaffeineCache" level="OFF"/>
+
+</configuration>
