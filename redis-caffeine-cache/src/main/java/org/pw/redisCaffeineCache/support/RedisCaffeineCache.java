@@ -119,11 +119,14 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         long expire = getExpire();
         logger.info("cache---------- put：{},expire:{}", getKey(key), expire);
         redisTemplate.opsForValue().set(getKey(key), toStoreValue(value), expire, TimeUnit.SECONDS);
+        logger.info("cache---------- redis set key:{} expire:{} value:{}", getKey(key), Duration.ofSeconds(expire), JSONObject.toJSONString(value));
+
 
         //缓存变更时通知其他节点清理本地缓存
         push(new CacheMessage(this.name, key, MDC.get(TraceIdUtils.TRACE_ID)));
-        //此处put没有意义，会收到自己发送的缓存key失效消息
-//        caffeineCache.put(key, value);
+
+        // logger.info("cache---------- put caffeineCache key:{},value:{}", key, JSONObject.toJSONString(value));
+        // caffeineCache.put(key, value);// //此处put没有意义，会收到自己发送的缓存key失效消息
     }
 
     @Override
@@ -132,8 +135,8 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         // 使用setIfAbsent原子性操作
         long expire = getExpire();
         boolean setSuccess;
-        setSuccess = redisTemplate.opsForValue().setIfAbsent(getKey(key), toStoreValue(value), Duration.ofSeconds(expire));
-
+        setSuccess = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(getKey(key), toStoreValue(value), Duration.ofSeconds(expire)));
+        logger.info("cache---------- redis setIfAbsent key:{} expire:{} result:{} value:{}", getKey(key), Duration.ofSeconds(expire), setSuccess, JSONObject.toJSONString(value));
         Object hasValue;
         //setNx结果
         if (setSuccess) {
@@ -141,14 +144,17 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             hasValue = value;
         } else {
             hasValue = redisTemplate.opsForValue().get(cacheKey);
+            logger.info("cache---------- redis get key:{} value:{}", cacheKey, JSONObject.toJSONString(hasValue));
         }
-
+        logger.info("cache---------- put caffeineCache key:{},value:{}", key, JSONObject.toJSONString(value));
         caffeineCache.put(key, toStoreValue(value));
         return toValueWrapper(hasValue);
     }
 
     @Override
     public void evict(Object key) {
+        logger.info("cache---------- evict key:{}", key);
+
         // 先清除redis中缓存数据，然后清除caffeine中的缓存，避免短时间内如果先清除caffeine缓存后其他请求会再从redis里加载到caffeine中
         redisTemplate.delete(getKey(key));
 
@@ -184,14 +190,15 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         Object cacheKey = getKey(key);
         Object value = caffeineCache.getIfPresent(key);
         if (value != null) {
-            logger.info("cache---------- 从本地缓存中获得key, the key is : {}", cacheKey);
+            logger.info("cache---------- 从本地缓存中获得key, key:{}", cacheKey);
             return value;
         }
 
         value = redisTemplate.opsForValue().get(cacheKey);
+        logger.info("cache---------- redis get key:{} value:{}", cacheKey, JSONObject.toJSONString(value));
 
         if (value != null) {
-            logger.info("cache---------- 从redis中获得值，将值放到本地缓存中, the key is : {}", cacheKey);
+            logger.info("cache---------- put caffeineCache key:{},value:{}", key, JSONObject.toJSONString(value));
             caffeineCache.put(key, value);
         }
         return value;
@@ -201,7 +208,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
      * @description 清理本地缓存
      */
     public void clearLocal(Object key) {
-        logger.info("cache---------- clear local cache, the key is : {}", key);
+        logger.info("cache---------- clear local cache, key:{}", key);
         if (key == null) {
             caffeineCache.invalidateAll();
         } else {
@@ -219,13 +226,14 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
     private long getExpire() {
         long expire = defaultExpiration;
         Long cacheNameExpire = defaultExpires.get(this.name);
-        return cacheNameExpire == null ? expire : cacheNameExpire.longValue();
+        return cacheNameExpire == null ? expire : cacheNameExpire;
     }
 
     /**
      * @description 缓存变更时通知其他节点清理本地缓存
      */
     private void push(CacheMessage message) {
+        logger.info("push cacheMessage,{}", JSONObject.toJSONString(message));
         redisTemplate.convertAndSend(topic, message);
     }
 

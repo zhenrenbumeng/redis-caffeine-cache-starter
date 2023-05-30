@@ -2,6 +2,7 @@ spring:
   redis:
     host: centos
     port: 6379
+    database: 2
     password:
     redissonDataBase: 0
     redissonThreads: 2

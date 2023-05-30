@@ -17,6 +17,6 @@
     <!--    </springProfile>-->
 
     <!--  关闭redisCaffeineCache内部log  -->
-    <logger name="org.pw.redisCaffeineCache" level="OFF"/>
+<!--    <logger name="org.pw.redisCaffeineCache" level="OFF"/>-->
 
 </configuration>

@@ -42,7 +42,7 @@ public class CacheMessageListener implements MessageListener {
         if (cacheMessage.getTraceId() != null) {
             MDC.put(TraceIdUtils.TRACE_ID, cacheMessage.getTraceId());
         }
-        logger.info("cache---------- 收到redis清除缓存消息, 开始清除本地缓存, the cacheName is {}, the key is {}", cacheMessage.getCacheName(), cacheMessage.getKey());
+        logger.info("cache---------- onMessage 开始清除本地缓存, the cacheName is {}, the key is {}", cacheMessage.getCacheName(), cacheMessage.getKey());
         redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
         MDC.clear();
     }
