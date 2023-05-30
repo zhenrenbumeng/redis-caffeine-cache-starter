@@ -39,6 +39,13 @@ public class CacheMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         CacheMessage cacheMessage = (CacheMessage) redisTemplate.getValueSerializer().deserialize(message.getBody());
+        if (cacheMessage.getMsgId() != null) {
+            boolean msgIdExistsAndInvalided = redisCaffeineCacheManager.getLocal4MessageListener(cacheMessage.getCacheName(), cacheMessage.getMsgId());
+            if (msgIdExistsAndInvalided) {
+                logger.info("cache---------- onMessage , dropped cacheName:{},key:{}", cacheMessage.getCacheName(), cacheMessage.getKey());
+                return;
+            }
+        }
         if (cacheMessage.getTraceId() != null) {
             MDC.put(TraceIdUtils.TRACE_ID, cacheMessage.getTraceId());
         }

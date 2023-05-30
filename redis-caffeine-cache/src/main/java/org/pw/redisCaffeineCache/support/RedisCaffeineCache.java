@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -123,10 +124,12 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
 
 
         //缓存变更时通知其他节点清理本地缓存
-        push(new CacheMessage(this.name, key, MDC.get(TraceIdUtils.TRACE_ID)));
+        String msgId = "caffeineCacheMsgId" + UUID.randomUUID().toString();
+        push(new CacheMessage(msgId, this.name, key, MDC.get(TraceIdUtils.TRACE_ID)));
+        caffeineCache.put(msgId, 0);
 
-        // logger.info("cache---------- put caffeineCache key:{},value:{}", key, JSONObject.toJSONString(value));
-        // caffeineCache.put(key, value);// //此处put没有意义，会收到自己发送的缓存key失效消息
+        logger.info("cache---------- put caffeineCache key:{},value:{}", key, JSONObject.toJSONString(value));
+        caffeineCache.put(key, value);
     }
 
     @Override

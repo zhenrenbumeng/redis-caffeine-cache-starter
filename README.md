@@ -114,6 +114,11 @@ cache.redisCaffeineCache:
 - cacheNames 可选为5分钟、15分钟、1小时、12小时、24小时、永久（100天）
 - key 保证缓存唯一性，支持SpEL: #dto.id
 
+> 如配置为  
+> cache.redisCaffeineCache.cachePrefix=redis-caffeine-cache #缓存key前缀  
+> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")  
+> id=1,则生成的缓存位置为: redis-caffeine-cache:cache:24h:user1
+
 ``` 
     //查询时存入缓存
     @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")
@@ -161,6 +166,9 @@ logback-spring.xml中配置
 ```
 
 ## 版本更新日志
+
+> 1.0.1  
+> 修正缓存put时未放入本地缓存问题：增加{msgId:0}到本地缓存，收到消息后判断如果本地缓存存在则invalid msgId，不清空本地缓存
 
 > 1.0.0  
 > 初版

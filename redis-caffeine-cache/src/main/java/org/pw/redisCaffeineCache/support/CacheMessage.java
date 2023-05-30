@@ -15,6 +15,10 @@ public class CacheMessage implements Serializable {
 
     private Object key;
 
+    private String msgId;
+    /**
+     * 日志跟踪
+     */
     private String traceId;
 
     public CacheMessage(String cacheName, Object key, String traceId) {
@@ -24,4 +28,11 @@ public class CacheMessage implements Serializable {
         this.traceId = traceId;
     }
 
+    public CacheMessage(String msgId, String cacheName, Object key, String traceId) {
+        super();
+        this.msgId = msgId;
+        this.cacheName = cacheName;
+        this.key = key;
+        this.traceId = traceId;
+    }
 }

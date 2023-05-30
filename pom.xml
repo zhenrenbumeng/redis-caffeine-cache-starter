@@ -16,7 +16,6 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <redis-caffeine-cache-version>1.0.0</redis-caffeine-cache-version>
     </properties>
 
 </project>

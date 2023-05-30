@@ -201,6 +201,27 @@ public class RedisCaffeineCacheManager implements CacheManager {
         redisCaffeineCache.clearLocal(key);
     }
 
+    public boolean getLocal4MessageListener(String cacheName, Object key) {
+        //cacheName为null 清除所有进程缓存
+        if (cacheName == null) {
+            return false;
+        }
+
+        Cache cache = cacheMap.get(cacheName);
+        if (cache == null) {
+            return false;
+        }
+
+        RedisCaffeineCache redisCaffeineCache = (RedisCaffeineCache) cache;
+        Object msgId = redisCaffeineCache.getCaffeineCache().getIfPresent(key);
+        if (msgId != null) {
+            redisCaffeineCache.getCaffeineCache().invalidate(key);
+            log.info("msgId exists. {}", key);
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 实例化本地一级缓存
      *
