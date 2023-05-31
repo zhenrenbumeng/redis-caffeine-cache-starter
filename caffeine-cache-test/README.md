@@ -1,0 +1,1 @@
+# 仅用于测试本地缓存CaffeineCache

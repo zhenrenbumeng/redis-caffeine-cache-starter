@@ -4,8 +4,9 @@
 
 ## module介绍
 
-- redis-caffeine-cache 分布式二级缓存主模块
-- redis-caffeine-cache-test 仅用于测试
+- redis-caffeine-cache：分布式二级缓存主模块
+- caffeine-cache-test：本地一级缓存测试模块，仅用于测试本地缓存
+- redis-caffeine-cache-test：仅用于测试分布式二级缓存
 
 ## 使用
 
