@@ -22,15 +22,8 @@ import java.util.UUID;
 public class Controller {
     @Resource
     UserServiceImpl userService;
-
-    @GetMapping("/user")
-    public User getUser(Integer id) {
-        return userService.getUser(id);
-    }
-
     @Resource
     RedisCaffeineCacheManager redisCaffeineCacheManager;
-
     /**
      * 测试缓存
      *
@@ -72,27 +65,23 @@ public class Controller {
 
         return user;
     }
-
     @GetMapping("/get")
     public User get(Integer id) {
         User user = userService.getUser(id);
         log.info("getUser {} {}", id, JSONObject.toJSONString(user));
         return user;
     }
-
     @GetMapping("/clearAllCache")
     public void clearAllCache() {
         //先清空redis缓存
         redisCaffeineCacheManager.clearAllCache();
     }
-
     @GetMapping("/update")
     public User update(Integer id, String name) {
         User user = userService.updateUser(id, name);
         log.info("user after update {} {}", id, JSONObject.toJSONString(user));
         return user;
     }
-
     /**
      * 删除缓存
      *
@@ -102,7 +91,6 @@ public class Controller {
     public void clearAllLocal(Integer id) {
         userService.delete(id);
     }
-
     /**
      * 显示所有cache
      *
@@ -111,6 +99,8 @@ public class Controller {
      */
     @GetMapping("allCaches")
     public String showCaches(String cacheName) {
-        return redisCaffeineCacheManager.allCaches(cacheName);
+        String s = redisCaffeineCacheManager.allCaches(cacheName);
+        log.info("allCaches cacheName:{} {}", cacheName, JSONObject.toJSONString(s));
+        return s;
     }
 }

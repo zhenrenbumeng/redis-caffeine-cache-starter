@@ -90,7 +90,6 @@ public class RedisCaffeineCacheManager implements CacheManager {
     public String allCaches(String cacheName) {
         JSONArray jsonArray = new JSONArray();
 
-        log.info("cache---------- RedisCaffeineCacheManager allCaches {}", cacheName);
         if (cacheName != null) {
             Cache cache = cacheMap.get(cacheName);
             if (cache == null) {
@@ -112,7 +111,8 @@ public class RedisCaffeineCacheManager implements CacheManager {
                 jsonArray.add(obj);
             }
         }
-        return jsonArray.toString();
+        log.info("cache---------- RedisCaffeineCacheManager allCaches cacheName:{} {}", cacheName, jsonArray.toJSONString());
+        return jsonArray.toJSONString();
     }
 
     /**

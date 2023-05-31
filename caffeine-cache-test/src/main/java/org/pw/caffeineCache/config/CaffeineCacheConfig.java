@@ -23,7 +23,7 @@ public class CaffeineCacheConfig {
      *
      * @return
      */
-    @Bean(name = "commonECManager")
+    @Bean(name = "commonCacheManager")
     public CacheManager commonCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
@@ -32,7 +32,6 @@ public class CaffeineCacheConfig {
         cacheManager.setCaffeine(caffeine);
         return cacheManager;
     }
-
     /**
      * 重要数据 本地缓存，如
      *
@@ -48,5 +47,4 @@ public class CaffeineCacheConfig {
         cacheManager.setCaffeine(caffeine);
         return cacheManager;
     }
-
 }

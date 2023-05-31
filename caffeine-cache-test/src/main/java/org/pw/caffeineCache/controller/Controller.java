@@ -2,7 +2,6 @@ package org.pw.caffeineCache.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.pw.caffeineCache.service.UserServiceImpl;
@@ -28,38 +27,32 @@ import java.util.concurrent.ConcurrentMap;
 public class Controller {
     @Resource
     UserServiceImpl userService;
-
     @GetMapping("/user")
     public User getUser(Integer id) {
         return userService.getUser(id);
     }
-
     @Resource
-    CacheManager commonECManager;
-
+    CacheManager commonCacheManager;
     @GetMapping("/get")
     public User get(Integer id) {
         User user = userService.getUser(id);
         log.info("getUser {} {}", id, JSONObject.toJSONString(user));
         return user;
     }
-
     @GetMapping("/update")
     public User update(Integer id, String name) {
         User user = userService.updateUser(id, name);
         log.info("user after update {} {}", id, JSONObject.toJSONString(user));
         return user;
     }
-
     @GetMapping("/evict")
     public void clearAllLocal(Integer id) {
         userService.delete(id);
     }
-
     @GetMapping("/allCaches")
     public String showCaches(String cacheName) {
         if (cacheName != null) {
-            Cache cache = commonECManager.getCache(cacheName);
+            Cache cache = commonCacheManager.getCache(cacheName);
             if (cache != null) {
                 CaffeineCache caffeineCache = (CaffeineCache) cache;
                 com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = caffeineCache.getNativeCache();
@@ -75,12 +68,12 @@ public class Controller {
             }
             return JSONObject.toJSONString(cache);
         }
-        Collection<String> cacheNames = commonECManager.getCacheNames();
+        Collection<String> cacheNames = commonCacheManager.getCacheNames();
         JSONArray jsonArray = new JSONArray();
         if (!CollectionUtils.isEmpty(cacheNames)) {
             for (String name : cacheNames) {
                 JSONObject object = new JSONObject();
-                Cache cache = commonECManager.getCache(name);
+                Cache cache = commonCacheManager.getCache(name);
 
                 if (cache != null) {
                     CaffeineCache caffeineCache = (CaffeineCache) cache;
@@ -101,14 +94,12 @@ public class Controller {
         }
         return jsonArray.toJSONString();
     }
-
     @GetMapping("/clearAllCache")
     public void clearAllCache() {
-        //先清空redis缓存
-        Collection<String> cacheNames = commonECManager.getCacheNames();
+        Collection<String> cacheNames = commonCacheManager.getCacheNames();
         if (!CollectionUtils.isEmpty(cacheNames)) {
             for (String name : cacheNames) {
-                commonECManager.getCache(name).clear();
+                commonCacheManager.getCache(name).clear();
                 log.info("clear cache cacheName:{}", name);
             }
         }
