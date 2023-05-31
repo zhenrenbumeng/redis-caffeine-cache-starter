@@ -70,7 +70,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
      */
     @Deprecated //clearAllCache未清空redis的问题已修正，废弃此方法
     public void clearAllCacheAndRedis(String cacheName) {
-        log.info("clearAllCacheAndRedis");
+        log.info("cache---------- RedisCaffeineCacheManager clearAllCacheAndRedis");
         if (cacheName != null) {
             Cache cache = cacheMap.get(cacheName);
             if (cache == null) {
@@ -90,7 +90,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
     public String allCaches(String cacheName) {
         JSONArray jsonArray = new JSONArray();
 
-        log.info("allCaches {}", cacheName);
+        log.info("cache---------- RedisCaffeineCacheManager allCaches {}", cacheName);
         if (cacheName != null) {
             Cache cache = cacheMap.get(cacheName);
             if (cache == null) {
@@ -157,10 +157,10 @@ public class RedisCaffeineCacheManager implements CacheManager {
     }
 
     public void evict(String cacheName, Object key) {
-        logger.info("cache---------- RedisCaffeineCacheManager .evict");
+        logger.info("cache---------- RedisCaffeineCacheManager evict {} {}", cacheName, key);
         //cacheName为null 清除所有进程缓存
         if (cacheName == null) {
-            log.info("cache---------- RedisCaffeineCacheManager 清除所有本地缓存");
+            log.info("cache---------- RedisCaffeineCacheManager cacheName is null, 清除所有本地缓存");
             // cacheMap = new ConcurrentHashMap<>();
             // 保持map基本结构存在，以便清除redis
             for (Cache value : cacheMap.values()) {
@@ -183,7 +183,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
     public void clearLocal(String cacheName, Object key) {
         //cacheName为null 清除所有进程缓存
         if (cacheName == null) {
-            log.info("cache---------- RedisCaffeineCacheManager 清除所有本地缓存");
+            log.info("cache---------- RedisCaffeineCacheManager cacheName is null, 清除所有本地缓存");
             // cacheMap = new ConcurrentHashMap<>();
             for (Cache value : cacheMap.values()) {
                 RedisCaffeineCache cache = (RedisCaffeineCache) value;
@@ -201,25 +201,26 @@ public class RedisCaffeineCacheManager implements CacheManager {
         redisCaffeineCache.clearLocal(key);
     }
 
-    public boolean getLocal4MessageListener(String cacheName, Object key) {
-        //cacheName为null 清除所有进程缓存
+    /**
+     * 当前应用场景是判断CacheMessage是否在本地缓存中
+     *
+     * @param cacheName
+     * @param key
+     * @return
+     */
+    public Object getLocal(String cacheName, Object key) {
         if (cacheName == null) {
-            return false;
+            return null;
         }
 
         Cache cache = cacheMap.get(cacheName);
         if (cache == null) {
-            return false;
+            return null;
         }
 
         RedisCaffeineCache redisCaffeineCache = (RedisCaffeineCache) cache;
-        Object msgId = redisCaffeineCache.getCaffeineCache().getIfPresent(key);
-        if (msgId != null) {
-            redisCaffeineCache.getCaffeineCache().invalidate(key);
-            log.info("msgId exists. {}", key);
-            return true;
-        }
-        return false;
+        Object obj = redisCaffeineCache.getCaffeineCache().getIfPresent(key);
+        return obj;
     }
 
     /**
@@ -277,6 +278,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
             cacheBuilder.maximumSize(maximumSize);
         }
         if (refreshAfterWrite > 0) {
+            log.info("cache---------- RedisCaffeineCacheManager 设置本地缓存写入后过期时间，{}秒", refreshAfterWrite);
             cacheBuilder.refreshAfterWrite(refreshAfterWrite, TimeUnit.SECONDS);
         }
         cacheBuilder.recordStats();

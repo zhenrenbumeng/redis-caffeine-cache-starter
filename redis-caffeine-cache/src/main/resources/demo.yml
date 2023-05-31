@@ -3,6 +3,7 @@
 cache.redisCaffeineCache:
   cachePrefix: redis-caffeine-cache #缓存key前缀
   dynamic: true #是否动态根据cacheName创建Cache的实现，默认true
+  logShowValue: true #RedisCaffeineCache 中log缓存时是否输出value
   redis:
     topic: redisCaffeine:topic
     defaultExpiration: 3600 #二级缓存默认redis过期时间，单位秒，默认3600s

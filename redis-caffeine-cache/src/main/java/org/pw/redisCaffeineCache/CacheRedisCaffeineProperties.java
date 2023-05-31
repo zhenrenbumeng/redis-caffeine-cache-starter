@@ -19,6 +19,10 @@ public class CacheRedisCaffeineProperties {
      * 是否动态根据cacheName创建Cache的实现，默认true
      */
     private boolean dynamic = true;
+    /**
+     * RedisCaffeineCache 日志中是否输出value
+     */
+    private boolean logShowValue = true;
 
     /**
      * 缓存key的前缀

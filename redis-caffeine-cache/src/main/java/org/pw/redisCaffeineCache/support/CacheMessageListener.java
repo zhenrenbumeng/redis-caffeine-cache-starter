@@ -39,18 +39,19 @@ public class CacheMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         CacheMessage cacheMessage = (CacheMessage) redisTemplate.getValueSerializer().deserialize(message.getBody());
-        if (cacheMessage.getMsgId() != null) {
-            boolean msgIdExistsAndInvalided = redisCaffeineCacheManager.getLocal4MessageListener(cacheMessage.getCacheName(), cacheMessage.getMsgId());
-            if (msgIdExistsAndInvalided) {
-                logger.info("cache---------- onMessage , dropped cacheName:{},key:{}", cacheMessage.getCacheName(), cacheMessage.getKey());
-                return;
-            }
-        }
         if (cacheMessage.getTraceId() != null) {
             MDC.put(TraceIdUtils.TRACE_ID, cacheMessage.getTraceId());
         }
-        logger.info("cache---------- onMessage 开始清除本地缓存, the cacheName is {}, the key is {}", cacheMessage.getCacheName(), cacheMessage.getKey());
+        if (cacheMessage.getMsgId() != null) {
+            Object msg = redisCaffeineCacheManager.getLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
+            if (msg != null) {
+                redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
+                logger.info("cache---------- CacheMessageListen onMessage, msgId exists, dropped cacheName:{} key:{}", cacheMessage.getCacheName(), cacheMessage.getKey());
+                return;
+            }
+        }
+        logger.info("cache---------- CacheMessageListen onMessage 开始清除本地缓存, cacheName:{} key:{}", cacheMessage.getCacheName(), cacheMessage.getKey());
         redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
-        MDC.clear();
+        MDC.remove(TraceIdUtils.TRACE_ID);
     }
 }
