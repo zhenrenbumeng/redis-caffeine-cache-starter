@@ -114,10 +114,11 @@ cache.redisCaffeineCache:
 - cacheManager 保持不变
 - cacheNames 可选为5分钟、15分钟、1小时、12小时、24小时、永久（100天）
 - key 保证缓存唯一性，支持SpEL: #dto.id
+- sync @Cacheable使用，避免缓存击穿
 
 > 如配置为  
 > cache.redisCaffeineCache.cachePrefix=redis-caffeine-cache #缓存key前缀  
-> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")  
+> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id", sync=true)  
 > id=1,则生成的缓存位置为: redis-caffeine-cache:cache:24h:user1
 
 ``` 
@@ -166,7 +167,17 @@ logback-spring.xml中配置
     <logger name="org.pw.redisCaffeineCache" level="OFF"/>
 ```
 
+## 总结内容
+
+. 防止缓存穿透(key在缓存中是不存在的)：已默认配置了 `allowNullValues=true;`:存储null值。  
+. 防止缓存击穿(高并发访问，key不存在):@Cacheable添加sync=true
+
 ## 版本更新日志
+
+> 1.0.3  
+> 缓存NullValue问题修正:  
+> -NullValue解析修正：配置fastjson Accept， 见RedisConfig  
+> -RedisCaffeineCache.get() NullValue返回null.
 
 > 1.0.2  
 > 日志格式统一、优化; trace_id完善;

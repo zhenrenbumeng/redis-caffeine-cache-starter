@@ -12,8 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- *
- *
  * @author @yangf.
  */
 @Slf4j
@@ -21,6 +19,7 @@ import java.util.Date;
 public class UserServiceImpl {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
     static User user = new User();
+
     //查询时存入缓存
     @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
     public User getUser(Integer id) {
@@ -29,6 +28,7 @@ public class UserServiceImpl {
         user.setName("初始值" + sdf.format(new Date()));
         return user;
     }
+
     //更新方法，更新缓存
     @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
     public User updateUser(Integer id, String name) {
@@ -36,11 +36,24 @@ public class UserServiceImpl {
         user.setName(name + sdf.format(new Date()));
         return user;
     }
+
     //删除时废弃缓存
     @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
     public User delete(Integer id) {
         user.setId(id);
         user.setName(null);
         return user;
+    }
+
+    // 测试不存在的数据
+    @Cacheable(
+      cacheManager = "L2_CacheManager",// 只配置一个缓存组件时不需要显示指定此参数
+      cacheNames = CacheNames.CACHE_5MINS,
+      key = "'user'+#id",
+      sync = true //避免缓存击穿
+    )
+    public User getUserWithoutCreate(Integer id) {
+        log.info("service getUserWithoutCreate", id);
+        return null;
     }
 }

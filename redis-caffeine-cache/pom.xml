@@ -12,7 +12,7 @@
 
     <groupId>org.pw</groupId>
     <artifactId>redis-caffeine-cache</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <name>redis-caffeine-cache</name>
     <description>redis-caffeine-cache</description>

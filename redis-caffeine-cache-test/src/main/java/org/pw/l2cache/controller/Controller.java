@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.pw.l2cache.po.User;
 import org.pw.l2cache.service.UserServiceImpl;
 import org.pw.redisCaffeineCache.support.CacheNames;
+import org.pw.redisCaffeineCache.support.RedisCaffeineCache;
 import org.pw.redisCaffeineCache.support.RedisCaffeineCacheManager;
+import org.springframework.cache.Cache;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +26,7 @@ public class Controller {
     UserServiceImpl userService;
     @Resource
     RedisCaffeineCacheManager redisCaffeineCacheManager;
+
     /**
      * 测试缓存
      *
@@ -65,23 +68,27 @@ public class Controller {
 
         return user;
     }
+
     @GetMapping("/get")
     public User get(Integer id) {
         User user = userService.getUser(id);
         log.info("getUser {} {}", id, JSONObject.toJSONString(user));
         return user;
     }
+
     @GetMapping("/clearAllCache")
     public void clearAllCache() {
         //先清空redis缓存
         redisCaffeineCacheManager.clearAllCache();
     }
+
     @GetMapping("/update")
     public User update(Integer id, String name) {
         User user = userService.updateUser(id, name);
         log.info("user after update {} {}", id, JSONObject.toJSONString(user));
         return user;
     }
+
     /**
      * 删除缓存
      *
@@ -91,6 +98,7 @@ public class Controller {
     public void clearAllLocal(Integer id) {
         userService.delete(id);
     }
+
     /**
      * 显示所有cache
      *
@@ -102,5 +110,12 @@ public class Controller {
         String s = redisCaffeineCacheManager.allCaches(cacheName);
         log.info("allCaches cacheName:{} {}", cacheName, JSONObject.toJSONString(s));
         return s;
+    }
+
+    @GetMapping("/getNull")
+    public User getNull(Integer notExistId) {
+        User user = userService.getUserWithoutCreate(notExistId);
+        log.info("getNull user:{}", JSONObject.toJSONString(user));
+        return user;
     }
 }

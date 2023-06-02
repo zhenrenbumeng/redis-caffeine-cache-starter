@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
+import org.springframework.cache.support.NullValue;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 
@@ -84,6 +85,9 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
     public <T> T get(Object key, Callable<T> valueLoader) {
         Object value = lookup(key);
         if (value != null) {
+            if (value instanceof NullValue) {
+                return null;
+            }
             return (T) value;
         }
         //key在redis和缓存中均不存在
@@ -128,7 +132,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         String traceId = MDC.get(TraceIdUtils.TRACE_ID);
         caffeineCache.put(msgId, traceId != null ? traceId : msgId);
         logger.info("cache---------- RedisCaffeineCache put 本地缓存 key:[{}],value:{}", key, JSONObject.toJSONString(value));
-        caffeineCache.put(key, value);
+        caffeineCache.put(key, toStoreValue(value));
     }
 
     @Override
@@ -191,7 +195,11 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         Object value = caffeineCache.getIfPresent(key);
         if (value != null) {
             if (this.logShowValue) {
-                logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}],value:{}", key, JSONObject.toJSONString(value));
+                if (value instanceof NullValue) {
+                    logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}],value:NullValue", key);
+                } else {
+                    logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}],value:{}", key, JSONObject.toJSONString(value));
+                }
             } else {
                 logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}]", key);
             }
@@ -200,7 +208,11 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         value = redisTemplate.opsForValue().get(cacheKey);
         if (value != null) {
             if (this.logShowValue) {
-                logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}],value:{}", cacheKey, JSONObject.toJSONString(value));
+                if (value instanceof NullValue) {
+                    logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}],value:NullValue", key);
+                } else {
+                    logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}],value:{}", cacheKey, JSONObject.toJSONString(value));
+                }
             } else {
                 logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}]", cacheKey);
             }

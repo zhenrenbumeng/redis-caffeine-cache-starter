@@ -19,6 +19,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
 /**
  * redis配置
  *
@@ -33,7 +34,7 @@ public class RedisConfig {
         template.setConnectionFactory(connectionFactory);
 
         FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
-        ParserConfig.getGlobalInstance().addAccept("com.lensung.trade.");
+        ParserConfig.getGlobalInstance().addAccept("org.springframework.cache.support.NullValue");
         ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
