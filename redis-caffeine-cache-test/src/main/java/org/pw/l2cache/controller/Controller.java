@@ -118,4 +118,29 @@ public class Controller {
         log.info("getNull user:{}", JSONObject.toJSONString(user));
         return user;
     }
+
+    @GetMapping("/threadTest")
+    public void threadTest() {
+        for (int i = 0; i < 100; i++) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                User user = userService.getUser(1);
+                log.info("user {}", JSONObject.toJSONString(user));
+            }).start();
+        }
+    }
+
+    @GetMapping("/threadTestSync")
+    public void threadTestSync() {
+        for (int i = 0; i < 100; i++) {
+            new Thread(() -> {
+                User user = userService.getUserSync(1);
+                log.info("user {}", JSONObject.toJSONString(user));
+            }).start();
+        }
+    }
 }

@@ -17,10 +17,20 @@ import java.util.Date;
 @Slf4j
 @Service
 public class UserServiceImpl {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS");
     static User user = new User();
 
+    //查询时存入缓存，sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", sync = true)
+    public User getUserSync(Integer id) {
+        log.info("new user");
+        user.setId(id);
+        user.setName("初始值" + sdf.format(new Date()));
+        return user;
+    }
+
     //查询时存入缓存
+    @Deprecated
     @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
     public User getUser(Integer id) {
         log.info("new user");
