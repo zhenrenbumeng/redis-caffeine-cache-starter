@@ -102,6 +102,9 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             lock.lock();
             value = lookup(key);
             if (value != null) {
+                if (value instanceof NullValue) {
+                    return null;
+                }
                 return (T) value;
             }
             //执行原方法获得value

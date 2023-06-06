@@ -11,6 +11,7 @@
     <modules>
         <module>redis-caffeine-cache</module>
         <module>redis-caffeine-cache-test</module>
+        <module>caffeine-cache-test</module>
     </modules>
 
     <properties>

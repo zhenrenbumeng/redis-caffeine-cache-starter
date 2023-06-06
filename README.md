@@ -38,7 +38,16 @@
 
 ### 2.原项目redis配置
 
-二级缓存使用原有的Redis配置
+二级缓存使用原有的Redis配置，参考redis-caffeine-cache-test模块config部分。
+务必配置fastjson,或符合如下条件
+> When enabling cacheNullValues please make sure the RedisSerializer used by RedisOperations is capable of serializing NullValue.
+``` 
+RefisConfig:
+
+        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
+        ParserConfig.getGlobalInstance().addAccept("org.springframework.cache.support.NullValue");
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+```
 
 ### 3.启动类配置
 
@@ -173,6 +182,8 @@ logback-spring.xml中配置
 . 防止缓存击穿(高并发访问，key不存在):@Cacheable添加sync=true
 
 ## 版本更新日志
+>1.0.4  
+> 缓存NullValue问题修正-补充 从Redis取得NullValue返回null.
 
 > 1.0.3  
 > 缓存NullValue问题修正:  
