@@ -79,7 +79,7 @@
     <distributionManagement>
         <repository>
             <id>releases</id>
-            <url>http://101.200.215.10:8083/repository/maven-releases/</url>
+            <url>http://101.200.215.10:8083/repository/cloud-3party/</url>
         </repository>
     </distributionManagement>
 </project>
