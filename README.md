@@ -38,16 +38,96 @@
 
 ### 2.原项目redis配置
 
-二级缓存使用原有的Redis配置，参考redis-caffeine-cache-test模块config部分。
-务必配置fastjson,或符合如下条件
-> When enabling cacheNullValues please make sure the RedisSerializer used by RedisOperations is capable of serializing NullValue.
+> 二级缓存使用原有的Redis配置，参考redis-caffeine-cache-test模块config部分。
+
+#### 2.1 情形1：
+
+> 定义bean`redisTemplate4L2Cache`
+
 ``` 
-RefisConfig:
+    @Bean
+    public RedisTemplate<Object, Object> redisTemplate4L2Cache(RedisConnectionFactory connectionFactory) {
+        return redisTemplate(connectionFactory);
+    }
+
+    @Bean
+    @Primary
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<Object, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
 
         FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
         ParserConfig.getGlobalInstance().addAccept("org.springframework.cache.support.NullValue");
         ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        serializer.setObjectMapper(mapper);
+
+        // 使用StringRedisSerializer来序列化和反序列化redis的key值
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+
+        // Hash的key也采用StringRedisSerializer的序列化方式
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
 ```
+
+#### 2.2 情形2
+
+> 原项目中已有了`redisTemplate`bean ：  
+> 1 原有`redisTemplate`添加一个 @primary 注解  
+> 2 使用下面的`redisTemplate4L2Cache` bean.
+
+``` 
+    @Bean
+    public RedisTemplate<Object, Object> redisTemplate4L2Cache(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<Object, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
+        ParserConfig.getGlobalInstance().addAccept("org.springframework.cache.support.NullValue");
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        serializer.setObjectMapper(mapper);
+
+        // 使用StringRedisSerializer来序列化和反序列化redis的key值
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+
+        // Hash的key也采用StringRedisSerializer的序列化方式
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Primary
+    @Bean
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>();
+        RedisSerializer redisSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(redisSerializer);
+        redisTemplate.setValueSerializer(redisSerializer);
+        redisTemplate.setHashKeySerializer(redisSerializer);
+        redisTemplate.setHashValueSerializer(redisSerializer);
+        redisTemplate.setConnectionFactory(factory);
+        redisTemplate.setEnableTransactionSupport(true);
+        return redisTemplate;
+    }
+```
+
+#### 2.3 其它情形
+
+必须满足以下条件
+> When enabling cacheNullValues please make sure the RedisSerializer used by RedisOperations is capable of serializing NullValue.
 
 ### 3.启动类配置
 
@@ -64,6 +144,8 @@ public class Application {
 ### 4.配置文件
 
 配置如下
+> 1 配置不同的cache.redisCaffeineCache.cachePrefix 用于redis中不同的命名空间  
+> 2 配置不同的cache.redisCaffeineCache.redis.topic 用于区分不同项目清除本地缓存消息
 
 ``` 
 cache.redisCaffeineCache:
@@ -182,7 +264,12 @@ logback-spring.xml中配置
 . 防止缓存击穿(高并发访问，key不存在):@Cacheable添加sync=true
 
 ## 版本更新日志
->1.0.4  
+
+> 1.0.5  
+> 兼容老项目：缓存使用的`redisTemplate` 替换为`redisTemplate4L2Cache`,以保留原项目默认的`redisTemplate`  
+> 参考 2.原项目Redis配置
+
+> 1.0.4  
 > 缓存NullValue问题修正-补充 从Redis取得NullValue返回null.
 
 > 1.0.3  

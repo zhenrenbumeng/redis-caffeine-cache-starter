@@ -113,6 +113,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             put(key, storeValue);
             return (T) value;
         } catch (Exception e) {
+            logger.error("cache---------- RedisCaffeineCache get error", e);
             throw new ValueRetrievalException(key, valueLoader, e.getCause());
         } finally {
             lock.unlock();
