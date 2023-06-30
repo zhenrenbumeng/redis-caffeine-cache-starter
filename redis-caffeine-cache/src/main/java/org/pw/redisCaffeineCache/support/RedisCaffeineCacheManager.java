@@ -260,7 +260,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
         long maximumSize = cacheConfig.getMaximumSize();
         long refreshAfterWrite = cacheConfig.getRefreshAfterWrite();
 
-        log.info("cache---------- RedisCaffeineCacheManager 本地缓存初始化：");
+        log.info("cache---------- RedisCaffeineCacheManager 本地缓存初始化：{}", name);
         if (expireAfterAccess > 0) {
             log.info("cache---------- RedisCaffeineCacheManager 设置本地缓存访问后过期时间，{}秒", expireAfterAccess);
             cacheBuilder.expireAfterAccess(expireAfterAccess, TimeUnit.SECONDS);
