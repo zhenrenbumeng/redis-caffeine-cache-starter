@@ -21,6 +21,8 @@ public class CacheMessage implements Serializable {
      */
     private String traceId;
 
+    private Long timestamp = System.currentTimeMillis();
+
     public CacheMessage(String cacheName, Object key, String traceId) {
         super();
         this.cacheName = cacheName;

@@ -39,6 +39,9 @@ public class CacheMessageListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         CacheMessage cacheMessage = (CacheMessage) redisTemplate.getValueSerializer().deserialize(message.getBody());
+        if (cacheMessage.getTimestamp() == null) {
+            cacheMessage.setTimestamp(0L);
+        }
         if (cacheMessage.getTraceId() != null) {
             MDC.put(TraceIdUtils.TRACE_ID, cacheMessage.getTraceId());
         }
@@ -46,11 +49,11 @@ public class CacheMessageListener implements MessageListener {
             Object msg = redisCaffeineCacheManager.getLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
             if (msg != null) {
                 redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
-                logger.info("cache---------- CacheMessageListen onMessage, msgId exists, dropped cacheName:{} key:{}", cacheMessage.getCacheName(), cacheMessage.getKey());
+                logger.info("cache---------- CacheMessageListen onMessage after {} 毫秒, msgId exists, dropped cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getCacheName(), cacheMessage.getKey());
                 return;
             }
         }
-        logger.info("cache---------- CacheMessageListen onMessage 开始清除本地缓存, cacheName:{} key:{}", cacheMessage.getCacheName(), cacheMessage.getKey());
+        logger.info("cache---------- CacheMessageListen onMessage after {} 毫秒, 开始清除本地缓存, cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getCacheName(), cacheMessage.getKey());
         redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
         MDC.remove(TraceIdUtils.TRACE_ID);
     }
