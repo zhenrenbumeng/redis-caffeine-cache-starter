@@ -26,18 +26,19 @@ public class RedisCaffeineCacheManager implements CacheManager {
 
     private final Logger logger = LoggerFactory.getLogger(RedisCaffeineCacheManager.class);
 
-    private static ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
+    private static final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>();
 
-    private CacheRedisCaffeineProperties cacheRedisCaffeineProperties;
+    private final CacheRedisCaffeineProperties cacheRedisCaffeineProperties;
 
-    private RedisTemplate<Object, Object> stringKeyRedisTemplate;
+    private final RedisTemplate<Object, Object> stringKeyRedisTemplate;
 
     private boolean dynamic = true;
 
-    private Set<String> cacheNames;
+    private final Set<String> cacheNames;
 
     {
         cacheNames = new HashSet<>();
+        cacheNames.add(CacheNames.CACHE_1MIN);
         cacheNames.add(CacheNames.CACHE_5MINS);
         cacheNames.add(CacheNames.CACHE_15MINS);
         cacheNames.add(CacheNames.CACHE_60MINS);
@@ -118,8 +119,6 @@ public class RedisCaffeineCacheManager implements CacheManager {
     /**
      * 返回所有进程缓存(二级缓存)的统计信息
      * result:{"缓存名称":统计信息}
-     *
-     * @return
      */
     public static Map<String, CacheStats> getCacheStats() {
         if (CollectionUtils.isEmpty(cacheMap)) {
@@ -203,10 +202,6 @@ public class RedisCaffeineCacheManager implements CacheManager {
 
     /**
      * 当前应用场景是判断CacheMessage是否在本地缓存中
-     *
-     * @param cacheName
-     * @param key
-     * @return
      */
     public Object getLocal(String cacheName, Object key) {
         if (cacheName == null) {
@@ -219,20 +214,19 @@ public class RedisCaffeineCacheManager implements CacheManager {
         }
 
         RedisCaffeineCache redisCaffeineCache = (RedisCaffeineCache) cache;
-        Object obj = redisCaffeineCache.getCaffeineCache().getIfPresent(key);
-        return obj;
+        return redisCaffeineCache.getCaffeineCache().getIfPresent(key);
     }
 
     /**
      * 实例化本地一级缓存
-     *
-     * @param name
-     * @return
      */
     private com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache(String name) {
         Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder();
         CacheRedisCaffeineProperties.CacheDefault cacheConfig;
         switch (name) {
+            case CacheNames.CACHE_1MIN:
+                cacheConfig = cacheRedisCaffeineProperties.getCache1m();
+                break;
             case CacheNames.CACHE_5MINS:
                 cacheConfig = cacheRedisCaffeineProperties.getCache5m();
                 break;

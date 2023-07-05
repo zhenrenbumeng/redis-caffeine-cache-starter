@@ -1,16 +1,17 @@
 # Redis-CaffeineCache分布式二级缓存
 
-> 基于 https://www.cnblogs.com/keeya/p/16556172.html 修正了redisCaffeineCache.clear()未能清除redis等问题
+> 基于 https://www.cnblogs.com/keeya/p/16556172.html  
+> 修正了redisCaffeineCache.clear()未能清除redis、redis订阅本机缓存被清空、NullValue等问题(核心变更见1.0.1-1.0.5版本更新记录)
 
 ## module介绍
 
 - redis-caffeine-cache：分布式二级缓存主模块
-- caffeine-cache-test：本地一级缓存测试模块，仅用于测试本地缓存
-- redis-caffeine-cache-test：仅用于测试分布式二级缓存
+- caffeine-cache-test：本地缓存测试模块,仅用于测试Caffeine cache本地缓存
+- redis-caffeine-cache-test：分布式二级缓存测试模块,实际项目使用可完全参考本模块
 
 ## 使用
 
-> 所有配置都可参考redis-caffeine-cache-test
+> 所有配置都可参考redis-caffeine-cache-test模块
 
 ### 1.添加dependency 版本以实际最新版本为准
 
@@ -18,7 +19,7 @@
 <dependency>
     <groupId>org.pw</groupId>
     <artifactId>redis-caffeine-cache</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.6</version>
 </dependency>
 
 <repositories>
@@ -164,6 +165,11 @@ cache.redisCaffeineCache:
   # 默认写入后过期时间，单位秒 expireAfterWrite = 120;
   #	默认初始化大小 initialCapacity = 50;
   #	默认最大缓存对象个数 maximumSize = 50;
+  cache1m:
+    expireAfterAccess: 60
+    expireAfterWrite: 60
+    initialCapacity: 10000
+    maximumSize: 100000
   cache5m:
     expireAfterAccess: 300
     expireAfterWrite: 300
@@ -203,18 +209,18 @@ cache.redisCaffeineCache:
 ##### 5.1 @Cacheable 存入缓存
 
 - cacheManager 保持不变
-- cacheNames 可选为5分钟、15分钟、1小时、12小时、24小时、永久（100天）
-- key 保证缓存唯一性，支持SpEL: #dto.id
+- cacheNames 可选为1分钟、5分钟、15分钟、1小时、12小时、24小时、永久（100天）
+- key 保证缓存唯一性，支持SpEL: #user.id
 - sync @Cacheable使用，避免缓存击穿
 
 > 如配置为  
 > cache.redisCaffeineCache.cachePrefix=redis-caffeine-cache #缓存key前缀  
-> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id", sync=true)  
+> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)  
 > id=1,则生成的缓存位置为: redis-caffeine-cache:cache:24h:user1
 
 ``` 
     //查询时存入缓存
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)
     public User getUser(Integer id) {
         log.info("new user");
         user.setId(id);
@@ -228,7 +234,7 @@ cache.redisCaffeineCache:
 
 ``` 
     //更新方法，更新缓存
-    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")
+    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)
     public User updateUser(Integer id, String name) {
         user.setId(id);
         user.setName(name + sdf.format(new Date()));
@@ -241,7 +247,7 @@ cache.redisCaffeineCache:
 
 ``` 
     //删除时废弃缓存
-    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")
+    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)
     public User delete(Integer id) {
         user.setId(id);
         user.setName(null);
@@ -264,6 +270,9 @@ logback-spring.xml中配置
 . 防止缓存击穿(高并发访问，key不存在):@Cacheable添加sync=true
 
 ## 版本更新日志
+
+> 1.0.6  
+> 1分钟缓存：Cachenames.CACHE_1MIN
 
 > 1.0.5  
 > 兼容老项目：缓存使用的`redisTemplate` 替换为`redisTemplate4L2Cache`,以保留原项目默认的`redisTemplate`  

@@ -2,6 +2,10 @@ package org.pw.redisCaffeineCache.support;
 
 public interface CacheNames {
     /**
+     * 1分钟缓存组
+     */
+    String CACHE_1MIN = "cache:1m";
+    /**
      * 5分钟缓存组
      */
     String CACHE_5MINS = "cache:5m";

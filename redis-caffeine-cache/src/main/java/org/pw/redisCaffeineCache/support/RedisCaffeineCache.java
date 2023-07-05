@@ -43,6 +43,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
     private Map<String, Long> defaultExpires = new HashMap<>();
 
     {
+        defaultExpires.put(CacheNames.CACHE_1MIN, TimeUnit.MINUTES.toSeconds(1));
         defaultExpires.put(CacheNames.CACHE_5MINS, TimeUnit.MINUTES.toSeconds(5));
         defaultExpires.put(CacheNames.CACHE_15MINS, TimeUnit.MINUTES.toSeconds(15));
         defaultExpires.put(CacheNames.CACHE_60MINS, TimeUnit.MINUTES.toSeconds(60));

@@ -32,6 +32,7 @@ public class CacheRedisCaffeineProperties {
     private Redis redis = new Redis();
 
     private CacheDefault cacheDefault = new CacheDefault();
+    private Cache1m cache1m = new Cache1m();
     private Cache5m cache5m = new Cache5m();
     private Cache15m cache15m = new Cache15m();
     private Cache60m cache60m = new Cache60m();
@@ -84,6 +85,9 @@ public class CacheRedisCaffeineProperties {
 
         /** 由于权重需要缓存对象来提供，对于使用spring cache这种场景不是很适合，所以暂不支持配置*/
 //		private long maximumWeight;
+    }
+
+    public class Cache1m extends CacheDefault {
     }
 
     public class Cache5m extends CacheDefault {

@@ -26,6 +26,11 @@ cache.redisCaffeineCache:
   # 默认写入后过期时间，单位秒 expireAfterWrite = 120;
   #	默认初始化大小 initialCapacity = 50;
   #	默认最大缓存对象个数 maximumSize = 50;
+  cache1m:
+    expireAfterAccess: 60
+    expireAfterWrite: 60
+    initialCapacity: 10000
+    maximumSize: 100000
   cache5m:
     expireAfterAccess: 300
     expireAfterWrite: 300

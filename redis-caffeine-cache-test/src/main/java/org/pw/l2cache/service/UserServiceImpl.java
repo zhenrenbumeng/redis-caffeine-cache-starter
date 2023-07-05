@@ -21,7 +21,7 @@ public class UserServiceImpl {
     static User user = new User();
 
     //查询时存入缓存，sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", sync = true)
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id", sync = true)
     public User getUserSync(Integer id) {
         log.info("new user");
         user.setId(id);
@@ -31,7 +31,7 @@ public class UserServiceImpl {
 
     //查询时存入缓存
     @Deprecated
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id")
     public User getUser(Integer id) {
         log.info("new user");
         user.setId(id);
@@ -40,7 +40,7 @@ public class UserServiceImpl {
     }
 
     //更新方法，更新缓存
-    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
+    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id")
     public User updateUser(Integer id, String name) {
         user.setId(id);
         user.setName(name + sdf.format(new Date()));
@@ -48,7 +48,7 @@ public class UserServiceImpl {
     }
 
     //删除时废弃缓存
-    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
+    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id")
     public User delete(Integer id) {
         user.setId(id);
         user.setName(null);
@@ -58,7 +58,7 @@ public class UserServiceImpl {
     // 测试不存在的数据
     @Cacheable(
       cacheManager = "L2_CacheManager",// 只配置一个缓存组件时不需要显示指定此参数
-      cacheNames = CacheNames.CACHE_5MINS,
+      cacheNames = CacheNames.CACHE_1MIN,
       key = "'user'+#id",
       sync = true //避免缓存击穿
     )
