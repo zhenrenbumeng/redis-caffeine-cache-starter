@@ -1,7 +1,8 @@
 # Redis-CaffeineCache分布式二级缓存
 
 > 基于 https://www.cnblogs.com/keeya/p/16556172.html  
-> 修正了redisCaffeineCache.clear()未能清除redis、redis订阅本机缓存被清空、NullValue等问题(核心变更见1.0.1-1.0.5版本更新记录)
+> 修正了redisCaffeineCache.clear()未能清除redis、redis订阅本机缓存被清空、NullValue等问题  
+> (核心变更见1.0.1-1.0.5版本更新记录)
 
 ## module介绍
 
@@ -234,7 +235,7 @@ cache.redisCaffeineCache:
 
 ``` 
     //更新方法，更新缓存
-    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)
+    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id")
     public User updateUser(Integer id, String name) {
         user.setId(id);
         user.setName(name + sdf.format(new Date()));
@@ -247,7 +248,7 @@ cache.redisCaffeineCache:
 
 ``` 
     //删除时废弃缓存
-    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)
+    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id")
     public User delete(Integer id) {
         user.setId(id);
         user.setName(null);

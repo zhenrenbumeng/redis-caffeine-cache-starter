@@ -31,7 +31,7 @@ public class UserServiceImpl {
 
     //查询时存入缓存
     @Deprecated
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id")
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id", sync = true)
     public User getUser(Integer id) {
         log.info("new user");
         user.setId(id);
