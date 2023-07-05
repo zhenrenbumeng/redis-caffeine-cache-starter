@@ -216,12 +216,12 @@ cache.redisCaffeineCache:
 
 > 如配置为  
 > cache.redisCaffeineCache.cachePrefix=redis-caffeine-cache #缓存key前缀  
-> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)  
+> @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id", sync=true)  
 > id=1,则生成的缓存位置为: redis-caffeine-cache:cache:24h:user1
 
 ``` 
     //查询时存入缓存
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id", sync=true)
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id", sync=true)
     public User getUser(Integer id) {
         log.info("new user");
         user.setId(id);
@@ -235,7 +235,7 @@ cache.redisCaffeineCache:
 
 ``` 
     //更新方法，更新缓存
-    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id")
+    @CachePut(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")
     public User updateUser(Integer id, String name) {
         user.setId(id);
         user.setName(name + sdf.format(new Date()));
@@ -248,7 +248,7 @@ cache.redisCaffeineCache:
 
 ``` 
     //删除时废弃缓存
-    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#user.id")
+    @CacheEvict(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_24HOUR, key = "'user'+#id")
     public User delete(Integer id) {
         user.setId(id);
         user.setName(null);
