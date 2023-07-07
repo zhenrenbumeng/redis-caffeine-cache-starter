@@ -4,7 +4,7 @@
         <withJansi>true</withJansi>
         <encoder>
 <!--            <pattern>%d{mm:ss} %highlight(%1.1level)[%X{trace_id}] %green([%25.25logger{15}][%20.20M]) %gray(%msg)\n</pattern>-->
-            <pattern>%d{mm:ss.SSS} %highlight(%1.1level)[%-13.-13X{trace_id}] %green([%20.20M]) %gray(%msg)\n</pattern>
+            <pattern>%d{mm:ss.SSS} %highlight(%1.1level)[%-13.-13X{trace_id}] %green([%20.20M]) %msg\n</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>

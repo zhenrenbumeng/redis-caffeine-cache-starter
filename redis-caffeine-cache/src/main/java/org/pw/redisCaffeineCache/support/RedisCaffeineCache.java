@@ -1,8 +1,10 @@
 package org.pw.redisCaffeineCache.support;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.Getter;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.pw.redisCaffeineCache.CacheRedisCaffeineProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -259,6 +262,18 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
     private void push(CacheMessage message) {
         logger.info("cache---------- RedisCaffeineCache push cacheMessage,{}", JSONObject.toJSONString(message));
         redisTemplate.convertAndSend(topic, message);
+    }
+
+    /**
+     * @description 调试方法，显示缓存
+     */
+    private void showCaches() {
+        JSONArray jsonArray = new JSONArray();
+        ConcurrentMap<@NonNull Object, @NonNull Object> objectObjectConcurrentMap = caffeineCache.asMap();
+        JSONObject obj = new JSONObject();
+        obj.put(this.name, objectObjectConcurrentMap);
+        jsonArray.add(obj);
+        logger.info("cache---------- RedisCaffeineCache showCaches:{}", JSONObject.toJSONString(jsonArray, true));
     }
 
 }
