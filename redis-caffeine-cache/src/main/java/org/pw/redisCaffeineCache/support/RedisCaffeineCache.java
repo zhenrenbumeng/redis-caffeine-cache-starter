@@ -98,7 +98,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         ReentrantLock lock = keyLockMap.get(key.toString());
 
         if (lock == null) {
-            logger.info("cache---------- RedisCaffeineCache create lock for key : {}", key);
+            logger.debug("L2_CacheManager RedisCaffeineCache create lock for key : {}", key);
             keyLockMap.putIfAbsent(key.toString(), new ReentrantLock());
             lock = keyLockMap.get(key.toString());
         }
@@ -117,7 +117,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             put(key, storeValue);
             return (T) value;
         } catch (Exception e) {
-            //logger.error("cache---------- RedisCaffeineCache get error", e);
+            //logger.error("L2_CacheManager RedisCaffeineCache get error", e);
             throw new ValueRetrievalException(key, valueLoader, e.getCause());
         } finally {
             lock.unlock();
@@ -132,15 +132,16 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         }
         long expire = getExpire();
         redisTemplate.opsForValue().set(getKey(key), toStoreValue(value), expire, TimeUnit.SECONDS);
-        logger.info("cache---------- RedisCaffeineCache put 二级缓存 key:[{}] expire:{} value:{}", getKey(key), Duration.ofSeconds(expire), JSONObject.toJSONString(value));
+        logger.debug("L2_CacheManager RedisCaffeineCache put 二级缓存 key:[{}] expire:{} value:{}", getKey(key), Duration.ofSeconds(expire), JSONObject.toJSONString(value));
 
         //缓存变更时通知其他节点清理本地缓存
         String msgId = TraceIdUtils.MSGID_CACHE_KEY_PREFIX + UUID.randomUUID();
         push(new CacheMessage(msgId, this.name, key, MDC.get(TraceIdUtils.TRACE_ID)));
         String traceId = MDC.get(TraceIdUtils.TRACE_ID);
         caffeineCache.put(msgId, traceId != null ? traceId : msgId);
-        logger.info("cache---------- RedisCaffeineCache put 本地缓存 key:[{}],value:{}", key, JSONObject.toJSONString(value));
+        logger.debug("L2_CacheManager RedisCaffeineCache put 本地缓存 key:[{}],value:{}", key, JSONObject.toJSONString(value));
         caffeineCache.put(key, toStoreValue(value));
+        logger.info("L2_CacheManager RedisCaffeineCache put key:[{}],value:{}", key, JSONObject.toJSONString(value));
     }
 
     @Override
@@ -158,14 +159,14 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         } else {
             hasValue = redisTemplate.opsForValue().get(cacheKey);
         }
-        logger.info("cache---------- RedisCaffeineCache put 本地缓存 key:[{}],value:{}", key, JSONObject.toJSONString(value));
         caffeineCache.put(key, toStoreValue(value));
+        logger.info("L2_CacheManager RedisCaffeineCache put 本地缓存 key:[{}],value:{}", key, JSONObject.toJSONString(value));
         return toValueWrapper(hasValue);
     }
 
     @Override
     public void evict(Object key) {
-        logger.info("cache---------- RedisCaffeineCache evict key:[{}]", key);
+        logger.debug("L2_CacheManager RedisCaffeineCache evict key:[{}]", key);
 
         // 先清除redis中缓存数据，然后清除caffeine中的缓存，避免短时间内如果先清除caffeine缓存后其他请求会再从redis里加载到caffeine中
         redisTemplate.delete(getKey(key));
@@ -204,12 +205,12 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         if (value != null) {
             if (this.logShowValue) {
                 if (value instanceof NullValue) {
-                    logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}],value:NullValue", key);
+                    logger.debug("L2_CacheManager RedisCaffeineCache 从本地缓存中获得key:[{}],value:NullValue", key);
                 } else {
-                    logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}],value:{}", key, JSONObject.toJSONString(value));
+                    logger.debug("L2_CacheManager RedisCaffeineCache 从本地缓存中获得key:[{}],value:{}", key, JSONObject.toJSONString(value));
                 }
             } else {
-                logger.info("cache---------- RedisCaffeineCache 从本地缓存中获得key:[{}]", key);
+                logger.debug("L2_CacheManager RedisCaffeineCache 从本地缓存中获得key:[{}]", key);
             }
             return value;
         }
@@ -217,12 +218,12 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         if (value != null) {
             if (this.logShowValue) {
                 if (value instanceof NullValue) {
-                    logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}],value:NullValue", key);
+                    logger.debug("L2_CacheManager RedisCaffeineCache 从二级缓存中获得key:[{}],value:NullValue", key);
                 } else {
-                    logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}],value:{}", cacheKey, JSONObject.toJSONString(value));
+                    logger.debug("L2_CacheManager RedisCaffeineCache 从二级缓存中获得key:[{}],value:{}", cacheKey, JSONObject.toJSONString(value));
                 }
             } else {
-                logger.info("cache---------- RedisCaffeineCache 从二级缓存中获得key:[{}]", cacheKey);
+                logger.debug("L2_CacheManager RedisCaffeineCache 从二级缓存中获得key:[{}]", cacheKey);
             }
             caffeineCache.put(key, value);
         }
@@ -237,7 +238,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             caffeineCache.invalidateAll();
         } else {
             if (!key.toString().startsWith(TraceIdUtils.MSGID_CACHE_KEY_PREFIX)) {
-                logger.info("cache---------- RedisCaffeineCache 清理本地缓存 key:[{}]", key);
+                logger.debug("L2_CacheManager RedisCaffeineCache 清理本地缓存 key:[{}]", key);
             }
             caffeineCache.invalidate(key);
         }
@@ -260,7 +261,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
      * @description 缓存变更时通知其他节点清理本地缓存
      */
     private void push(CacheMessage message) {
-        logger.info("cache---------- RedisCaffeineCache push cacheMessage,{}", JSONObject.toJSONString(message));
+        logger.debug("L2_CacheManager RedisCaffeineCache push cacheMessage,{}", JSONObject.toJSONString(message));
         redisTemplate.convertAndSend(topic, message);
     }
 
@@ -273,7 +274,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
         JSONObject obj = new JSONObject();
         obj.put(this.name, objectObjectConcurrentMap);
         jsonArray.add(obj);
-        logger.info("cache---------- RedisCaffeineCache showCaches:{}", JSONObject.toJSONString(jsonArray, true));
+        logger.info("L2_CacheManager RedisCaffeineCache showCaches:{}", JSONObject.toJSONString(jsonArray, true));
     }
 
 }

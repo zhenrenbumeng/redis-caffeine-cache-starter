@@ -1,5 +1,6 @@
 package org.pw.redisCaffeineCache.support;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.ParserConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,19 @@ public class CacheMessageListener implements MessageListener {
         if (cacheMessage.getTimestamp() == null) {
             cacheMessage.setTimestamp(0L);
         }
+        if (cacheMessage.getTraceId() != null) {
+            MDC.put(TraceIdUtils.TRACE_ID, cacheMessage.getTraceId());
+        }
+        // put()时msgId不为null，其它evict、clear等方法时msgId会为null。
         if (cacheMessage.getMsgId() != null) {
             Object msg = redisCaffeineCacheManager.getLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
             if (msg != null) {
                 redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
-                logger.info("cache---------- CacheMessageListen onMessage after {} 毫秒, msgId:{} exists, dropped. cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
+                logger.debug("L2_CacheManager CacheMessageListen onMessage after {} 毫秒, msgId:{} exists, dropped. cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
                 return;
             }
         }
-        logger.info("cache---------- CacheMessageListen onMessage after {} 毫秒, msgId:{} , 开始清除本地缓存, cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
+        logger.debug("L2_CacheManager CacheMessageListen onMessage after {} 毫秒, msgId:{} , 开始清除本地缓存, cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
         redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
     }
 }

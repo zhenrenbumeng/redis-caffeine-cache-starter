@@ -4,11 +4,11 @@
         <withJansi>true</withJansi>
         <encoder>
 <!--            <pattern>%d{mm:ss} %highlight(%1.1level)[%X{trace_id}] %green([%25.25logger{15}][%20.20M]) %gray(%msg)\n</pattern>-->
-            <pattern>%d{mm:ss.SSS} %highlight(%1.1level)[%-13.-13X{trace_id}] %green([%20.20M]) %msg\n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%1.1level)[%-13.-13X{trace_id}] [%30.30thread] %green([%20.20M]) %msg\n</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="LOCAL"/>
     </root>
     <!--    <springProfile name="">-->
@@ -17,7 +17,8 @@
     <!--        </root>-->
     <!--    </springProfile>-->
 
-    <!--  关闭redisCaffeineCache内部log  -->
-<!--    <logger name="org.pw.redisCaffeineCache" level="OFF"/>-->
-
+    <!--        <logger name="org.pw.l2cache" level="OFF"/>-->
+    
+    <!--  日志设为debug级别  -->
+    <!--    <logger name="org.pw.redisCaffeineCache" level="DEBUG"/>-->
 </configuration>

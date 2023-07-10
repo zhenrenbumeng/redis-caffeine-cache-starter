@@ -33,7 +33,7 @@ public class CacheRedisCaffeineAutoConfiguration {
     @Bean("L2_CacheManager")
     @ConditionalOnBean(RedisTemplate.class)
     public RedisCaffeineCacheManager cacheManager() {
-        log.info("cache---------- L2_CacheManager");
+        log.info("L2_CacheManager L2_CacheManager");
         return new RedisCaffeineCacheManager(cacheRedisCaffeineProperties, redisTemplate);
     }
 

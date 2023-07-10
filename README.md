@@ -20,7 +20,7 @@
 <dependency>
     <groupId>org.pw</groupId>
     <artifactId>redis-caffeine-cache</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 </dependency>
 
 <repositories>
@@ -257,9 +257,11 @@ cache.redisCaffeineCache:
     
 ```
 
-### 可选：屏蔽redis-caffeine-cache日志
+### 可选：~~屏蔽redis-caffeine-cache日志~~
 
-logback-spring.xml中配置
+1.0.7版日志已优化，只记录put日志，不需要屏蔽。
+
+~~logback-spring.xml中配置~~
 
 ```
     <logger name="org.pw.redisCaffeineCache" level="OFF"/>
@@ -271,6 +273,15 @@ logback-spring.xml中配置
 . 防止缓存击穿(高并发访问，key不存在):@Cacheable添加sync=true
 
 ## 版本更新日志
+
+> 1.0.7  
+> 精简log：  
+> 前缀统一为L2_CacheManager  
+> 除初始化等log，只要使用缓存总是会触发`put`，所以核心只保留put log： `L2_CacheManager RedisCaffeineCache put key:[xx],value:{xx}`  
+> lookup、get等日志降级为DEBUG  
+> evict、clear等日志降级为DEBUG  
+> 因缓存过期没有日志，CacheMessageListener.onMessage() 主动清理缓存（@Cacheable、@CacheEvict、@CachePut）日志降级为DEBUG
+
 
 > 1.0.6  
 > 1分钟缓存：Cachenames.CACHE_1MIN
