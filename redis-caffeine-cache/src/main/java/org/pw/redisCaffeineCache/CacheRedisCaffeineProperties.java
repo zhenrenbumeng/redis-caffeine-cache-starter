@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.HashMap;
 import java.util.Map;
 
-@ConfigurationProperties(prefix = "cache.redis-caffeine-cache")
+@ConfigurationProperties(prefix = "cache.l2cache")
 @Data
 public class CacheRedisCaffeineProperties {
 
@@ -27,7 +27,7 @@ public class CacheRedisCaffeineProperties {
     /**
      * 缓存key的前缀
      */
-    private String cachePrefix;
+    private String cachePrefix="l2cache";
 
     private Redis redis = new Redis();
 
@@ -56,7 +56,7 @@ public class CacheRedisCaffeineProperties {
         /**
          * 缓存更新时通知其他节点的topic名称
          */
-        private String topic = "cache:redis:caffeine:topic";
+        private String topic = "l2cache:topic";
 
     }
 
@@ -88,23 +88,65 @@ public class CacheRedisCaffeineProperties {
     }
 
     public class Cache1m extends CacheDefault {
+        public Cache1m() {
+            expireAfterAccess = 60;
+            expireAfterWrite = 60;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 
     public class Cache5m extends CacheDefault {
+        public Cache5m() {
+            expireAfterAccess = 300;
+            expireAfterWrite = 300;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 
     public class Cache15m extends CacheDefault {
+        public Cache15m() {
+            expireAfterAccess = 900;
+            expireAfterWrite = 900;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 
     public class Cache60m extends CacheDefault {
+        public Cache60m() {
+            expireAfterAccess = 3600;
+            expireAfterWrite = 3600;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 
     public class Cache12h extends CacheDefault {
+        public Cache12h() {
+            expireAfterAccess = 43200;
+            expireAfterWrite = 43200;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 
     public class Cache24h extends CacheDefault {
+        public Cache24h() {
+            expireAfterAccess = 86400;
+            expireAfterWrite = 86400;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 
     public class CachePermanent extends CacheDefault {
+        public CachePermanent() {
+            expireAfterAccess = -1;
+            expireAfterWrite = -1;
+            initialCapacity = 1000;
+            maximumSize = 100000;
+        }
     }
 }

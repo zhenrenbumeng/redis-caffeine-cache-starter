@@ -2,62 +2,63 @@ spring:
   redis:
     host: centos
     port: 6379
-    database: 2
+    database: 2 #maybe无效配置
     password:
-    redissonDataBase: 0
+    redissonDataBase: 0 #有效配置
     redissonThreads: 2
     redissonNettyThreads: 2
 #配置模板:
 #更多可自定义配置参考 CacheRedisCaffeineProperties.Java
-cache.redisCaffeineCache:
-  cachePrefix: redis-caffeine-cache #缓存key前缀
-  dynamic: true #是否动态根据cacheName创建Cache的实现，默认true
-  logShowValue: true #RedisCaffeineCache 中log缓存时是否输出value
-  redis:
-    topic: redisCaffeine:topic
-    defaultExpiration: 3600 #二级缓存默认redis过期时间，单位秒，默认3600s
-  # 针对自定义cacheName的本地一级缓存配置
-  cacheDefault:
-    expireAfterAccess: 86400 #访问后过期时间，单位秒
-    expireAfterWrite: 86400 #写入后过期时间，单位秒 1天
-    initialCapacity: 10000 #初始化大小
-    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
-
-  # 默认写入后过期时间，单位秒 expireAfterWrite = 120;
-  #	默认初始化大小 initialCapacity = 50;
-  #	默认最大缓存对象个数 maximumSize = 50;
-  cache1m:
-    expireAfterAccess: 60
-    expireAfterWrite: 60
-    initialCapacity: 10000
-    maximumSize: 100000
-  cache5m:
-    expireAfterAccess: 300
-    expireAfterWrite: 300
-    initialCapacity: 10000
-    maximumSize: 100000
-  cache15m:
-    expireAfterAccess: 900
-    expireAfterWrite: 900
-    initialCapacity: 10000
-    maximumSize: 100000
-  cache60m:
-    expireAfterAccess: 3600 #访问后过期时间，单位秒
-    expireAfterWrite: 3600 #写入后过期时间，单位秒 1小时
-    initialCapacity: 10000 #初始化大小
-    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
-  cache12h:
-    expireAfterAccess: 43200 #访问后过期时间，单位秒
-    expireAfterWrite: 43200 #写入后过期时间，单位秒 12小时
-    initialCapacity: 10000 #初始化大小
-    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
-  cache24h:
-    expireAfterAccess: 86400 #访问后过期时间，单位秒
-    expireAfterWrite: 86400 #写入后过期时间，单位秒 1天
-    initialCapacity: 10000 #初始化大小
-    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
-  cachePermanent:
-    expireAfterAccess: 8640000 #访问后过期时间，单位秒
-    expireAfterWrite: 8640000 #写入后过期时间，单位秒 100天
-    initialCapacity: 10000 #初始化大小
-    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
+#1.0.8 以下为默认配置，如需修改，取消注释。
+#cache.l2cache:
+#  cachePrefix: l2cache #缓存key前缀
+#  dynamic: true #是否动态根据cacheName创建Cache的实现，默认true
+#  logShowValue: true #RedisCaffeineCache 中log缓存时是否输出value
+#  redis:
+#    topic: l2cache:topic
+#    defaultExpiration: 3600 #二级缓存默认redis过期时间，单位秒，默认3600s
+#  # 针对自定义cacheName的本地一级缓存配置
+#  cacheDefault:
+#    expireAfterAccess: 86400 #访问后过期时间，单位秒 1天
+#    expireAfterWrite: 86400 #写入后过期时间，单位秒
+#    initialCapacity: 10000 #初始化大小
+#    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
+#
+#  # 默认写入后过期时间，单位秒 expireAfterWrite = 120;
+#  #	默认初始化大小 initialCapacity = 50;
+#  #	默认最大缓存对象个数 maximumSize = 50;
+#  cache1m:
+#    expireAfterAccess: 60
+#    expireAfterWrite: 60
+#    initialCapacity: 1000
+#    maximumSize: 100000
+#  cache5m:
+#    expireAfterAccess: 300
+#    expireAfterWrite: 300
+#    initialCapacity: 10000
+#    maximumSize: 100000
+#  cache15m:
+#    expireAfterAccess: 900
+#    expireAfterWrite: 900
+#    initialCapacity: 10000
+#    maximumSize: 100000
+#  cache60m:
+#    expireAfterAccess: 3600 #访问后过期时间，单位秒
+#    expireAfterWrite: 3600 #写入后过期时间，单位秒 1小时
+#    initialCapacity: 10000 #初始化大小
+#    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
+#  cache12h:
+#    expireAfterAccess: 43200 #访问后过期时间，单位秒
+#    expireAfterWrite: 43200 #写入后过期时间，单位秒 12小时
+#    initialCapacity: 10000 #初始化大小
+#    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
+#  cache24h:
+#    expireAfterAccess: 86400 #访问后过期时间，单位秒
+#    expireAfterWrite: 86400 #写入后过期时间，单位秒 1天
+#    initialCapacity: 10000 #初始化大小
+#    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
+#  cachePermanent:
+#    expireAfterAccess: 8640000 #访问后过期时间，单位秒
+#    expireAfterWrite: 8640000 #写入后过期时间，单位秒 100天
+#    initialCapacity: 10000 #初始化大小
+#    maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存

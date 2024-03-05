@@ -143,7 +143,8 @@ public class Application {
 }
 ```
 
-### 4.配置文件
+### ~~4.配置文件~~
+> 此项废弃，1.0.8版本可以不需要配置
 
 配置如下
 > 1 配置不同的cache.redisCaffeineCache.cachePrefix 用于redis中不同的命名空间  
@@ -273,6 +274,11 @@ cache.redisCaffeineCache:
 . 防止缓存击穿(高并发访问，key不存在):@Cacheable添加sync=true
 
 ## 版本更新日志
+
+> 1.0.8    
+> 增加默认配置，不再需要编辑配置文件  
+> 修改了一些配置项的名称，参考配置文件中已注释掉的默认配置：主要将缓存名称改为l2cache开头.  
+> 有效配置是写入后过期时间，访问后过期时间设置测试无效
 
 > 1.0.7  
 > 精简log：  
