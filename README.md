@@ -301,7 +301,7 @@ cache.redisCaffeineCache:
 
 <details> <summary><mark>更多更新记录</mark></summary>
 
-> > 1.0.7  
+> 1.0.7  
 > 精简log：  
 > 前缀统一为L2_CacheManager  
 > 除初始化等log，只要使用缓存总是会触发`put`，所以核心只保留put log： `L2_CacheManager RedisCaffeineCache put key:[xx],value:{xx}`  
