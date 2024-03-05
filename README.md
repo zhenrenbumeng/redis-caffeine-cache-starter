@@ -40,7 +40,10 @@
 
 ### 2.原项目redis配置
 
-> 二级缓存使用原有的Redis配置，参考redis-caffeine-cache-test模块config部分。
+> 二级缓存使用原有的Redis配置，参考redis-caffeine-cache-test模块config部分。  
+> 核心是配置一个名为`redisTemplate4L2Cache`的bean，用于二级缓存使用。  
+> ParserConfig.getGlobalInstance().addAccept("org.springframework.cache.support.NullValue");//支持缓存NullValue
+
 
 #### 2.1 情形1：
 
@@ -314,4 +317,28 @@ cache.redisCaffeineCache:
 > 初版
 
 
+## 内存占用情况直观感受
+1条物流公司记录 456B
+1978条物流公司记录 768KB
 
+```json
+{
+  "@type": "com.lensung.distribution.trade.po.ExpressCompanyPO",
+  "brandCode": "",
+  "companyCode": "ZTO",
+  "companyName": "中通快递",
+  "companyType": 1,
+  "createTime": "2022-05-17T17:48:03",
+  "id": 94,
+  "logisticsCode": "9",
+  "logisticsType": 1,
+  "often": false,
+  "pinyin": "",
+  "platform": "ksxd",
+  "supportParent": false,
+  "updateTime": "2022-10-08T14:14:18",
+  "waybillNoReg": "",
+  "waybillPlatform": "ksxd"
+}
+
+```
