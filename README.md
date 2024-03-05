@@ -46,7 +46,7 @@
 
 <details>
 
-<summary>参考内容</summary>
+<summary><mark>参考内容</mark></summary>
 
 #### 2.1 情形1：
 
@@ -157,7 +157,7 @@ public class Application {
 
 <details> 
 
-<summary>默认配置</summary>
+<summary><mark>默认配置</mark></summary>
 
 配置如下
 > 1 配置不同的cache.redisCaffeineCache.cachePrefix 用于redis中不同的命名空间  
@@ -223,7 +223,7 @@ cache.redisCaffeineCache:
 
 > 更多方法参考redis-caffeine-cache-test模块Controller类
 
-<details> <summary>基本使用参考</summary>
+<details> <summary><mark>基本使用参考</mark></summary>
 
 ##### 5.1 @Cacheable 存入缓存
 
@@ -299,7 +299,7 @@ cache.redisCaffeineCache:
 > 修改了一些配置项的名称，参考配置文件中已注释掉的默认配置：主要将缓存名称改为l2cache开头.  
 > 有效配置是写入后过期时间，访问后过期时间设置测试无效
 
-<details> <summary>更多更新记录</summary>
+<details> <summary><mark>更多更新记录</mark></summary>
 
 > > 1.0.7  
 > 精简log：  
