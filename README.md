@@ -20,7 +20,7 @@
 <dependency>
     <groupId>org.pw</groupId>
     <artifactId>redis-caffeine-cache</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
 </dependency>
 
 <repositories>
@@ -44,6 +44,9 @@
 > 核心是配置一个名为`redisTemplate4L2Cache`的bean，用于二级缓存使用。  
 > ParserConfig.getGlobalInstance().addAccept("org.springframework.cache.support.NullValue");//支持缓存NullValue
 
+<details>
+
+<summary>参考内容</summary>
 
 #### 2.1 情形1：
 
@@ -134,6 +137,8 @@
 必须满足以下条件
 > When enabling cacheNullValues please make sure the RedisSerializer used by RedisOperations is capable of serializing NullValue.
 
+</details>
+
 ### 3.启动类配置
 
 ```
@@ -147,7 +152,12 @@ public class Application {
 ```
 
 ### ~~4.配置文件~~
+
 > 此项废弃，1.0.8版本可以不需要配置
+
+<details> 
+
+<summary>默认配置</summary>
 
 配置如下
 > 1 配置不同的cache.redisCaffeineCache.cachePrefix 用于redis中不同的命名空间  
@@ -207,9 +217,13 @@ cache.redisCaffeineCache:
     maximumSize: 100000 #最大缓存对象个数，超过此数量时会使用Window TinyLfu策略来淘汰缓存
 ```
 
+</details>
+
 ### 5.基本使用
 
 > 更多方法参考redis-caffeine-cache-test模块Controller类
+
+<details> <summary>基本使用参考</summary>
 
 ##### 5.1 @Cacheable 存入缓存
 
@@ -261,6 +275,8 @@ cache.redisCaffeineCache:
     
 ```
 
+</details>
+
 ### 可选：~~屏蔽redis-caffeine-cache日志~~
 
 1.0.7版日志已优化，只记录put日志，不需要屏蔽。
@@ -283,7 +299,9 @@ cache.redisCaffeineCache:
 > 修改了一些配置项的名称，参考配置文件中已注释掉的默认配置：主要将缓存名称改为l2cache开头.  
 > 有效配置是写入后过期时间，访问后过期时间设置测试无效
 
-> 1.0.7  
+<details> <summary>更多更新记录</summary>
+
+> > 1.0.7  
 > 精简log：  
 > 前缀统一为L2_CacheManager  
 > 除初始化等log，只要使用缓存总是会触发`put`，所以核心只保留put log： `L2_CacheManager RedisCaffeineCache put key:[xx],value:{xx}`  
@@ -315,11 +333,12 @@ cache.redisCaffeineCache:
 
 > 1.0.0  
 > 初版
-
+>
+</details>
 
 ## 内存占用情况直观感受
-1条物流公司记录 456B
-1978条物流公司记录 768KB
+
+1条物流公司记录 456B 1978条物流公司记录 768KB
 
 ```json
 {
