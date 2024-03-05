@@ -6,10 +6,10 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @EnableCaching
 @SpringBootApplication(scanBasePackages = {"org.pw.redisCaffeineCache", "org.pw.l2cache"})
-public class Application {
+public class L2cacheTestApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(L2cacheTestApplication.class, args);
     }
 
 }

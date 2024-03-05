@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  * @author @yangf.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = L2cacheTestApplication.class)
 @ActiveProfiles("")
 @Slf4j
 public class CacheTests {

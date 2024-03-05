@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.pw.l2cache.po.User;
 import org.pw.l2cache.service.UserServiceImpl;
+import org.pw.redisCaffeineCache.support.CacheNames;
 import org.pw.redisCaffeineCache.support.RedisCaffeineCacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,13 @@ public class Controller {
     UserServiceImpl userService;
     @Resource
     RedisCaffeineCacheManager redisCaffeineCacheManager;
+
+    @GetMapping("/test1min")
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'test1min'", sync = true)
+    public String test1min() {
+        log.info("test1min");
+        return "hello";
+    }
 
     /**
      * 测试缓存
