@@ -29,6 +29,18 @@ public class UserServiceImpl {
         return user;
     }
 
+    //查询时存入缓存，sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_12HOUR, key = "'user'+#id")
+    public User getUserNull(Integer id) {
+        return null;
+    }
+
+    //查询时存入缓存，sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_12HOUR, key = "'user'+#id", sync = true)
+    public User getUserNullSync(Integer id) {
+        return null;
+    }
+
     //查询时存入缓存
     @Deprecated
     @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_1MIN, key = "'user'+#id", sync = true)
@@ -61,10 +73,10 @@ public class UserServiceImpl {
 
     // 测试不存在的数据
     @Cacheable(
-      cacheManager = "L2_CacheManager",// 只配置一个缓存组件时不需要显示指定此参数
-      cacheNames = CacheNames.CACHE_1MIN,
-      key = "'user'+#id",
-      sync = true //避免缓存击穿
+            cacheManager = "L2_CacheManager",// 只配置一个缓存组件时不需要显示指定此参数
+            cacheNames = CacheNames.CACHE_1MIN,
+            key = "'user'+#id",
+            sync = true //避免缓存击穿
     )
     public User getUserWithoutCreate(Integer id) {
         log.info("service getUserWithoutCreate {}", id);

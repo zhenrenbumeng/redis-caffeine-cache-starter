@@ -82,6 +82,20 @@ public class Controller {
         return user;
     }
 
+    @GetMapping("/testNull")
+    public User testNull() {
+        User user = userService.getUserNull(null);
+        log.info("getUser {} {}", null, user);
+        return user;
+    }
+
+    @GetMapping("/testNullSync")
+    public User testNullSync() {
+        User user = userService.getUserNullSync(null);
+        log.info("getUser {} {}", null, user);
+        return user;
+    }
+
     @GetMapping("/clearAllCache")
     public void clearAllCache() {
         //先清空redis缓存

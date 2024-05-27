@@ -17,12 +17,20 @@
 ### 1.添加dependency 版本以实际最新版本为准
 
 ```
-<dependency>
-    <groupId>org.pw</groupId>
-    <artifactId>redis-caffeine-cache</artifactId>
-    <version>1.0.8</version>
-</dependency>
-
+<dependencies>
+    <dependency>
+        <groupId>org.pw</groupId>
+        <artifactId>redis-caffeine-cache</artifactId>
+        <version>1.0.8</version>
+    </dependency>
+    
+    <-- 如果使用2.7.x(案例中使用2.7.10),启动失败RedisMessageListenerContainer，则使用3.17.3版本Redisson -->
+    <dependency>
+        <groupId>org.redisson</groupId>
+        <artifactId>redisson-spring-boot-starter</artifactId>
+        <version>3.17.3</version>
+    </dependency>
+</dependencies>
 <repositories>
     <repository>
         <id>lcdt</id>
@@ -135,7 +143,8 @@
 #### 2.3 其它情形
 
 必须满足以下条件
-> When enabling cacheNullValues please make sure the RedisSerializer used by RedisOperations is capable of serializing NullValue.
+> When enabling cacheNullValues please make sure the RedisSerializer used by RedisOperations is capable of serializing
+> NullValue.
 
 </details>
 
@@ -294,17 +303,33 @@ cache.redisCaffeineCache:
 
 ## 版本更新日志
 
+> 1.0.9
+> 1. 修复：调用方springboot如果使用2.7.x(案例使用2.7.10)，出现 "org.springframework.cache.support.NullValue cannot be cast
+     to xxx"问题
+> 2. 如果启动失败：RedisMessageListenerContainer,redisson应升级 :3.17.3
+> 3. 可通过/testNull 测试。
+
+问题出现的场景：
+如果没有unless过滤，将null值存入了缓存，且sync=false时出现。  
+org.springframework.cache.interceptor.CacheAspectSupport.execute方法中，  
+如果sync为true，调用RedisCaffeineCache.get()方法，会处理NullValue.
+否则调用lookup(),未处理NullValue.
+
+``` 
+@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id",sync=false)
+```
+
+<details> <summary><mark>更多更新记录</mark></summary>
 > 1.0.8    
 > 增加默认配置，不再需要编辑配置文件  
 > 修改了一些配置项的名称，参考配置文件中已注释掉的默认配置：主要将缓存名称改为l2cache开头.  
 > 有效配置是写入后过期时间，访问后过期时间设置测试无效
 
-<details> <summary><mark>更多更新记录</mark></summary>
-
 > 1.0.7  
 > 精简log：  
 > 前缀统一为L2_CacheManager  
-> 除初始化等log，只要使用缓存总是会触发`put`，所以核心只保留put log： `L2_CacheManager RedisCaffeineCache put key:[xx],value:{xx}`  
+> 除初始化等log，只要使用缓存总是会触发`put`，所以核心只保留put
+> log： `L2_CacheManager RedisCaffeineCache put key:[xx],value:{xx}`  
 > lookup、get等日志降级为DEBUG  
 > evict、clear等日志降级为DEBUG  
 > 因缓存过期没有日志，CacheMessageListener.onMessage() 主动清理缓存（@Cacheable、@CacheEvict、@CachePut）日志降级为DEBUG
