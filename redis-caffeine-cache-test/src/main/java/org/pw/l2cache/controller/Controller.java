@@ -82,27 +82,6 @@ public class Controller {
         return user;
     }
 
-    @GetMapping("/testNull")
-    public User testNull() {
-        User user = userService.getUserNull(null);
-        log.info("testNull {} {}", null, user);
-        return user;
-    }
-
-    @GetMapping("/testNullSync")
-    public User testNullSync() {
-        User user = userService.getUserNullSync(null);
-        log.info("testNullSync {} {}", null, user);
-        return user;
-    }
-
-    @GetMapping("/testNullCondition")
-    public User testNullCondition() {
-        User user = userService.getUserNullCondition(null);
-        log.info("testNullCondition {} {}", null, user);
-        return user;
-    }
-
     @GetMapping("/clearAllCache")
     public void clearAllCache() {
         //先清空redis缓存
@@ -143,6 +122,13 @@ public class Controller {
     public User getNull(Integer notExistId) {
         User user = userService.getUserWithoutCreate(notExistId);
         log.info("getNull user:{}", JSONObject.toJSONString(user));
+        return user;
+    }
+
+    @GetMapping("/testNull")
+    public User testNull() {
+        User user = userService.getUserNull(null);
+        log.info("testNull {} {}", null, user);
         return user;
     }
 

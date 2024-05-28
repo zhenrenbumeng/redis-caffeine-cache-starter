@@ -17,20 +17,12 @@
 ### 1.添加dependency 版本以实际最新版本为准
 
 ```
-<dependencies>
-    <dependency>
-        <groupId>org.pw</groupId>
-        <artifactId>redis-caffeine-cache</artifactId>
-        <version>1.0.8</version>
-    </dependency>
-    
-    <-- 如果使用2.7.x(案例中使用2.7.10),启动失败RedisMessageListenerContainer，则使用3.17.3版本Redisson -->
-    <dependency>
-        <groupId>org.redisson</groupId>
-        <artifactId>redisson-spring-boot-starter</artifactId>
-        <version>3.17.3</version>
-    </dependency>
-</dependencies>
+<dependency>
+    <groupId>org.pw</groupId>
+    <artifactId>redis-caffeine-cache</artifactId>
+    <version>1.0.8</version>
+</dependency>
+
 <repositories>
     <repository>
         <id>lcdt</id>
@@ -303,46 +295,12 @@ cache.redisCaffeineCache:
 
 ## 版本更新日志
 
-> 1.0.9 等价于1.0.8
-> 1. 调用方springboot如果使用2.7.x(案例使用2.7.10)，出现 "org.springframework.cache.support.NullValue cannot be cast
-     to xxx"问题：底层没有合适处理方案，只能调用时处理
-> 2. 如果启动失败：RedisMessageListenerContainer,redisson应升级 :3.17.3
-> 3. 可通过/testNull 测试。
+> 1.0.10
+> 修复启动2个实例, 第二个 value != NullValue.INSTANCE, 最终出现ClassCastException
 
-### 问题出现的场景：
-如果没有unless过滤，将null值存入了缓存，且sync=false时出现。  
-org.springframework.cache.interceptor.CacheAspectSupport.execute方法中，  
-如果sync为true，调用RedisCaffeineCache.get()方法，会处理NullValue.
-否则调用lookup(),未处理NullValue.
+### 详情
 
-``` 
-@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
-```
-### 解决方案1
-也是本文一直使用的方式：
-``` 
-/**
- * 避免NullValue正确处理方式1：sync=true,调用RedisCaffeineCache.get方法
- * sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
- */
-@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", sync = true)
-public User getUserNullSync(Integer id) {
-    return null;
-}
-``` 
-### 解决方案2
-``` 
-/**
- * 避免NullValue正确处理方式2: unless="#result==null"
- */
-@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", condition = "#id!=null", unless = "#result==null")
-public User getUserNullCondition(Integer id) {
-    if (id == null) {
-        return null;
-    }
-    return new User(id, id + "_" + sdf.format(new Date()));
-}
-```
+![img.png](img.png)
 
 <details> <summary><mark>更多更新记录</mark></summary>
 > 1.0.8    
