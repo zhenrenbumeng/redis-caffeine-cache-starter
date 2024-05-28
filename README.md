@@ -309,7 +309,7 @@ cache.redisCaffeineCache:
 > 2. 如果启动失败：RedisMessageListenerContainer,redisson应升级 :3.17.3
 > 3. 可通过/testNull 测试。
 
-问题出现的场景：
+### 问题出现的场景：
 如果没有unless过滤，将null值存入了缓存，且sync=false时出现。  
 org.springframework.cache.interceptor.CacheAspectSupport.execute方法中，  
 如果sync为true，调用RedisCaffeineCache.get()方法，会处理NullValue.
@@ -318,7 +318,8 @@ org.springframework.cache.interceptor.CacheAspectSupport.execute方法中，
 ``` 
 @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
 ```
-解决方案1，也是本文一直使用的方式：
+### 解决方案1
+也是本文一直使用的方式：
 ``` 
 /**
  * 避免NullValue正确处理方式1：sync=true,调用RedisCaffeineCache.get方法
@@ -329,7 +330,7 @@ public User getUserNullSync(Integer id) {
     return null;
 }
 ``` 
-解决方案2:
+### 解决方案2
 ``` 
 /**
  * 避免NullValue正确处理方式2: unless="#result==null"
