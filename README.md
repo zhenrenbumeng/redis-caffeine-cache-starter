@@ -303,9 +303,9 @@ cache.redisCaffeineCache:
 
 ## 版本更新日志
 
-> 1.0.9
-> 1. 修复：调用方springboot如果使用2.7.x(案例使用2.7.10)，出现 "org.springframework.cache.support.NullValue cannot be cast
-     to xxx"问题
+> 1.0.9 等价于1.0.8
+> 1. 调用方springboot如果使用2.7.x(案例使用2.7.10)，出现 "org.springframework.cache.support.NullValue cannot be cast
+     to xxx"问题：底层没有合适处理方案，只能调用时处理
 > 2. 如果启动失败：RedisMessageListenerContainer,redisson应升级 :3.17.3
 > 3. 可通过/testNull 测试。
 
@@ -316,7 +316,31 @@ org.springframework.cache.interceptor.CacheAspectSupport.execute方法中，
 否则调用lookup(),未处理NullValue.
 
 ``` 
-@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id",sync=false)
+@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
+```
+解决方案1，也是本文一直使用的方式：
+``` 
+/**
+ * 避免NullValue正确处理方式1：sync=true,调用RedisCaffeineCache.get方法
+ * sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
+ */
+@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", sync = true)
+public User getUserNullSync(Integer id) {
+    return null;
+}
+``` 
+解决方案2:
+``` 
+/**
+ * 避免NullValue正确处理方式2: unless="#result==null"
+ */
+@Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", condition = "#id!=null", unless = "#result==null")
+public User getUserNullCondition(Integer id) {
+    if (id == null) {
+        return null;
+    }
+    return new User(id, id + "_" + sdf.format(new Date()));
+}
 ```
 
 <details> <summary><mark>更多更新记录</mark></summary>

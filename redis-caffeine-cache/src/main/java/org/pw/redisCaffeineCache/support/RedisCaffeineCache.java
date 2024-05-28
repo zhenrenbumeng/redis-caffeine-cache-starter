@@ -212,9 +212,6 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             } else {
                 logger.debug("L2_CacheManager RedisCaffeineCache 从本地缓存中获得key:[{}]", key);
             }
-            if (value instanceof NullValue) {
-                return null;
-            }
             return value;
         }
         value = redisTemplate.opsForValue().get(cacheKey);
@@ -229,9 +226,6 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
                 logger.debug("L2_CacheManager RedisCaffeineCache 从二级缓存中获得key:[{}]", cacheKey);
             }
             caffeineCache.put(key, value);
-            if (value instanceof NullValue) {
-                return null;
-            }
         }
         return value;
     }

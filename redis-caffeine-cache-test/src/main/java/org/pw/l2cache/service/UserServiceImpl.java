@@ -29,17 +29,36 @@ public class UserServiceImpl {
         return user;
     }
 
-    //查询时存入缓存，sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_12HOUR, key = "'user'+#id")
+    //region NullValue问题测试
+    /**
+     * sync为false，执行RedisCaffeineCache.lookup方法，将返回NullValue,出现ClassCastException
+     */
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id")
     public User getUserNull(Integer id) {
         return null;
     }
 
-    //查询时存入缓存，sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
-    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_12HOUR, key = "'user'+#id", sync = true)
+    /**
+     * 避免NullValue正确处理方式1：sync=true,调用RedisCaffeineCache.get方法
+     * sync=true:解决缓存击穿问题（本地查加锁，避免高并发下获取不到缓存都去执行实际方法）
+     */
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", sync = true)
     public User getUserNullSync(Integer id) {
         return null;
     }
+
+
+    /**
+     * 避免NullValue正确处理方式2: unless="#result==null"
+     */
+    @Cacheable(cacheManager = "L2_CacheManager", cacheNames = CacheNames.CACHE_5MINS, key = "'user'+#id", condition = "#id!=null", unless = "#result==null")
+    public User getUserNullCondition(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return new User(id, id + "_" + sdf.format(new Date()));
+    }
+    //endregion
 
     //查询时存入缓存
     @Deprecated

@@ -85,14 +85,21 @@ public class Controller {
     @GetMapping("/testNull")
     public User testNull() {
         User user = userService.getUserNull(null);
-        log.info("getUser {} {}", null, user);
+        log.info("testNull {} {}", null, user);
         return user;
     }
 
     @GetMapping("/testNullSync")
     public User testNullSync() {
         User user = userService.getUserNullSync(null);
-        log.info("getUser {} {}", null, user);
+        log.info("testNullSync {} {}", null, user);
+        return user;
+    }
+
+    @GetMapping("/testNullCondition")
+    public User testNullCondition() {
+        User user = userService.getUserNullCondition(null);
+        log.info("testNullCondition {} {}", null, user);
         return user;
     }
 
