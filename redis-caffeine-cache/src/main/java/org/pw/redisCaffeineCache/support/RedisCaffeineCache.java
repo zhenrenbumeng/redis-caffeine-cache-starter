@@ -212,6 +212,7 @@ public class RedisCaffeineCache extends AbstractValueAdaptingCache {
             } else {
                 logger.debug("L2_CacheManager RedisCaffeineCache 从本地缓存中获得key:[{}]", key);
             }
+            // Ensure that storeValue is the singleton instance of NullValue
             if (value instanceof NullValue) {
                 value = NullValue.INSTANCE;
             }
