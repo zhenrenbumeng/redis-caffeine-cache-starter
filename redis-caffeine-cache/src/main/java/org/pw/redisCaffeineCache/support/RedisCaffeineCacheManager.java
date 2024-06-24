@@ -23,9 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RedisCaffeineCacheManager implements CacheManager {
-
-    private final Logger logger = LoggerFactory.getLogger(RedisCaffeineCacheManager.class);
-
     private static final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>();
 
     private final CacheRedisCaffeineProperties cacheRedisCaffeineProperties;
@@ -71,7 +68,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
      */
     @Deprecated //clearAllCache未清空redis的问题已修正，废弃此方法
     public void clearAllCacheAndRedis(String cacheName) {
-        log.info("L2_CacheManager RedisCaffeineCacheManager clearAllCacheAndRedis");
+        log.info("[L2_CacheManager] RedisCaffeineCacheManager clearAllCacheAndRedis");
         if (cacheName != null) {
             Cache cache = cacheMap.get(cacheName);
             if (cache == null) {
@@ -112,7 +109,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
                 jsonArray.add(obj);
             }
         }
-        log.info("L2_CacheManager RedisCaffeineCacheManager allCaches cacheName:{} {}", cacheName, jsonArray.toJSONString());
+        log.info("[L2_CacheManager] RedisCaffeineCacheManager allCaches cacheName:{} {}", cacheName, jsonArray.toJSONString());
         return jsonArray.toJSONString();
     }
 
@@ -146,7 +143,7 @@ public class RedisCaffeineCacheManager implements CacheManager {
 
         cache = new RedisCaffeineCache(name, stringKeyRedisTemplate, caffeineCache(name), cacheRedisCaffeineProperties);
         Cache oldCache = cacheMap.putIfAbsent(name, cache);
-        logger.info("L2_CacheManager RedisCaffeineCacheManager create cache instance, the cache name is : {}", name);
+        log.info("[L2_CacheManager] RedisCaffeineCacheManager create cache instance, the cache name is : {}", name);
         return oldCache == null ? cache : oldCache;
     }
 
@@ -156,10 +153,10 @@ public class RedisCaffeineCacheManager implements CacheManager {
     }
 
     public void evict(String cacheName, Object key) {
-        logger.info("L2_CacheManager RedisCaffeineCacheManager evict {} {}", cacheName, key);
+        log.info("[L2_CacheManager] RedisCaffeineCacheManager evict {} {}", cacheName, key);
         //cacheName为null 清除所有进程缓存
         if (cacheName == null) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager cacheName is null, 清除所有本地缓存");
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager cacheName is null, 清除所有本地缓存");
             // cacheMap = new ConcurrentHashMap<>();
             // 保持map基本结构存在，以便清除redis
             for (Cache value : cacheMap.values()) {
@@ -180,10 +177,10 @@ public class RedisCaffeineCacheManager implements CacheManager {
     }
 
     public void clearLocal(String cacheName, Object key) {
-        logger.debug("clearLocal cacheName:{} key:{}", cacheName, key);
+        log.debug("clearLocal cacheName:{} key:{}", cacheName, key);
         //cacheName为null 清除所有进程缓存
         if (cacheName == null) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager cacheName is null, 清除所有本地缓存");
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager cacheName is null, 清除所有本地缓存");
             // cacheMap = new ConcurrentHashMap<>();
             for (Cache value : cacheMap.values()) {
                 RedisCaffeineCache cache = (RedisCaffeineCache) value;
@@ -255,25 +252,25 @@ public class RedisCaffeineCacheManager implements CacheManager {
         long maximumSize = cacheConfig.getMaximumSize();
         long refreshAfterWrite = cacheConfig.getRefreshAfterWrite();
 
-        log.info("L2_CacheManager RedisCaffeineCacheManager 本地缓存初始化：{}", name);
+        log.info("[L2_CacheManager] RedisCaffeineCacheManager 本地缓存初始化：{}", name);
         if (expireAfterAccess > 0) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager 设置本地缓存访问后过期时间，{}秒", expireAfterAccess);
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager 设置本地缓存访问后过期时间，{}秒", expireAfterAccess);
             cacheBuilder.expireAfterAccess(expireAfterAccess, TimeUnit.SECONDS);
         }
         if (expireAfterWrite > 0) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager 设置本地缓存写入后过期时间，{}秒", expireAfterWrite);
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager 设置本地缓存写入后过期时间，{}秒", expireAfterWrite);
             cacheBuilder.expireAfterWrite(expireAfterWrite, TimeUnit.SECONDS);
         }
         if (initialCapacity > 0) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager 设置缓存初始化大小{}", initialCapacity);
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager 设置缓存初始化大小{}", initialCapacity);
             cacheBuilder.initialCapacity(initialCapacity);
         }
         if (maximumSize > 0) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager 设置本地缓存最大值{}", maximumSize);
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager 设置本地缓存最大值{}", maximumSize);
             cacheBuilder.maximumSize(maximumSize);
         }
         if (refreshAfterWrite > 0) {
-            log.info("L2_CacheManager RedisCaffeineCacheManager 设置本地缓存写入后过期时间，{}秒", refreshAfterWrite);
+            log.info("[L2_CacheManager] RedisCaffeineCacheManager 设置本地缓存写入后过期时间，{}秒", refreshAfterWrite);
             cacheBuilder.refreshAfterWrite(refreshAfterWrite, TimeUnit.SECONDS);
         }
         cacheBuilder.recordStats();

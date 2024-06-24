@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.pw.redisCaffeineCache.support.CacheMessageListener;
 import org.pw.redisCaffeineCache.support.RedisCaffeineCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -33,7 +32,7 @@ public class CacheRedisCaffeineAutoConfiguration {
     @Bean("L2_CacheManager")
     @ConditionalOnBean(RedisTemplate.class)
     public RedisCaffeineCacheManager cacheManager() {
-        log.info("L2_CacheManager init.");
+        log.info("[L2_CacheManager] init.");
         return new RedisCaffeineCacheManager(cacheRedisCaffeineProperties, redisTemplate);
     }
 

@@ -295,14 +295,19 @@ cache.redisCaffeineCache:
 
 ## 版本更新日志
 
-> 1.0.10
-> 修复启动2个实例, 第二个 value != NullValue.INSTANCE, 最终出现ClassCastException
+> 1.0.11
+> evict 日志级别改为info
 
 ### 详情
 
 ![img.png](img.png)
 
 <details> <summary><mark>更多更新记录</mark></summary>
+
+> 1.0.10
+> 修复启动2个实例, 第二个 value != NullValue.INSTANCE, 最终出现ClassCastException
+
+
 > 1.0.8    
 > 增加默认配置，不再需要编辑配置文件  
 > 修改了一些配置项的名称，参考配置文件中已注释掉的默认配置：主要将缓存名称改为l2cache开头.  

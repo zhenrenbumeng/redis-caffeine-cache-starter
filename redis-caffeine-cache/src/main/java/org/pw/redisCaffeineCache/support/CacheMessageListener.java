@@ -1,7 +1,7 @@
 package org.pw.redisCaffeineCache.support;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.ParserConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -12,9 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 /**
  * @summary 缓存监听器
  */
+@Slf4j
 public class CacheMessageListener implements MessageListener {
-
-    private final Logger logger = LoggerFactory.getLogger(CacheMessageListener.class);
 
     private RedisTemplate<Object, Object> redisTemplate;
 
@@ -51,11 +50,11 @@ public class CacheMessageListener implements MessageListener {
             Object msg = redisCaffeineCacheManager.getLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
             if (msg != null) {
                 redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getMsgId());
-                logger.debug("L2_CacheManager CacheMessageListen onMessage after {} 毫秒, msgId:{} exists, dropped. cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
+                log.debug("[L2_CacheManager] CacheMessageListen onMessage after {} 毫秒, msgId:{} exists, dropped. cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
                 return;
             }
         }
-        logger.debug("L2_CacheManager CacheMessageListen onMessage after {} 毫秒, msgId:{} , 开始清除本地缓存, cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
+        log.debug("[L2_CacheManager] CacheMessageListen onMessage after {} 毫秒, msgId:{} , 开始清除本地缓存, cacheName:{} key:{}", System.currentTimeMillis() - cacheMessage.getTimestamp(), cacheMessage.getMsgId(), cacheMessage.getCacheName(), cacheMessage.getKey());
         redisCaffeineCacheManager.clearLocal(cacheMessage.getCacheName(), cacheMessage.getKey());
     }
 }
